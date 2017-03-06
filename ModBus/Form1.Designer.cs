@@ -31,9 +31,9 @@
 			this.menuStrip1 = new System.Windows.Forms.MenuStrip();
 			this.ms_SerialPort = new System.Windows.Forms.ToolStripMenuItem();
 			this.ms_sp_port = new System.Windows.Forms.ToolStripMenuItem();
+			this.ms_sp_port_combobox = new System.Windows.Forms.ToolStripComboBox();
 			this.ms_sp_baud = new System.Windows.Forms.ToolStripMenuItem();
 			this.ms_sp_baud_combobox = new System.Windows.Forms.ToolStripComboBox();
-			this.ms_sp_port_combobox = new System.Windows.Forms.ToolStripComboBox();
 			this.ms_sp_conect = new System.Windows.Forms.ToolStripMenuItem();
 			this.ms_sp_disconect = new System.Windows.Forms.ToolStripMenuItem();
 			this.timer1 = new System.Windows.Forms.Timer(this.components);
@@ -63,6 +63,7 @@
 			this.btn_send.TabIndex = 2;
 			this.btn_send.Text = "Send";
 			this.btn_send.UseVisualStyleBackColor = true;
+			this.btn_send.Click += new System.EventHandler(this.btn_send_Click);
 			// 
 			// menuStrip1
 			// 
@@ -90,22 +91,8 @@
 			this.ms_sp_port.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.ms_sp_port_combobox});
 			this.ms_sp_port.Name = "ms_sp_port";
-			this.ms_sp_port.Size = new System.Drawing.Size(152, 22);
+			this.ms_sp_port.Size = new System.Drawing.Size(126, 22);
 			this.ms_sp_port.Text = "Port";
-			// 
-			// ms_sp_baud
-			// 
-			this.ms_sp_baud.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.ms_sp_baud_combobox});
-			this.ms_sp_baud.Name = "ms_sp_baud";
-			this.ms_sp_baud.Size = new System.Drawing.Size(152, 22);
-			this.ms_sp_baud.Text = "BaudRate";
-			// 
-			// ms_sp_baud_combobox
-			// 
-			this.ms_sp_baud_combobox.Name = "ms_sp_baud_combobox";
-			this.ms_sp_baud_combobox.Size = new System.Drawing.Size(121, 23);
-			this.ms_sp_baud_combobox.SelectedIndexChanged += new System.EventHandler(this.ms_sp_baud_combobox_SelectedIndexChanged);
 			// 
 			// ms_sp_port_combobox
 			// 
@@ -114,10 +101,24 @@
 			this.ms_sp_port_combobox.DropDown += new System.EventHandler(this.ms_sp_port_combobox_DropDown);
 			this.ms_sp_port_combobox.SelectedIndexChanged += new System.EventHandler(this.ms_sp_port_combobox_SelectedIndexChanged);
 			// 
+			// ms_sp_baud
+			// 
+			this.ms_sp_baud.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.ms_sp_baud_combobox});
+			this.ms_sp_baud.Name = "ms_sp_baud";
+			this.ms_sp_baud.Size = new System.Drawing.Size(126, 22);
+			this.ms_sp_baud.Text = "BaudRate";
+			// 
+			// ms_sp_baud_combobox
+			// 
+			this.ms_sp_baud_combobox.Name = "ms_sp_baud_combobox";
+			this.ms_sp_baud_combobox.Size = new System.Drawing.Size(121, 23);
+			this.ms_sp_baud_combobox.SelectedIndexChanged += new System.EventHandler(this.ms_sp_baud_combobox_SelectedIndexChanged);
+			// 
 			// ms_sp_conect
 			// 
 			this.ms_sp_conect.Name = "ms_sp_conect";
-			this.ms_sp_conect.Size = new System.Drawing.Size(152, 22);
+			this.ms_sp_conect.Size = new System.Drawing.Size(126, 22);
 			this.ms_sp_conect.Text = "Conect";
 			this.ms_sp_conect.Click += new System.EventHandler(this.ms_sp_conect_Click);
 			// 
@@ -125,9 +126,14 @@
 			// 
 			this.ms_sp_disconect.Enabled = false;
 			this.ms_sp_disconect.Name = "ms_sp_disconect";
-			this.ms_sp_disconect.Size = new System.Drawing.Size(152, 22);
+			this.ms_sp_disconect.Size = new System.Drawing.Size(126, 22);
 			this.ms_sp_disconect.Text = "Disconect";
 			this.ms_sp_disconect.Click += new System.EventHandler(this.ms_sp_disconect_Click);
+			// 
+			// timer1
+			// 
+			this.timer1.Interval = 500;
+			this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
 			// 
 			// Form1
 			// 
@@ -140,7 +146,7 @@
 			this.Controls.Add(this.menuStrip1);
 			this.MainMenuStrip = this.menuStrip1;
 			this.Name = "Form1";
-			this.Text = "Form1";
+			this.Text = "ModBus - Master of Puppets";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
 			this.menuStrip1.ResumeLayout(false);
 			this.menuStrip1.PerformLayout();

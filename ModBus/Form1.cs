@@ -46,6 +46,7 @@ namespace ModBus {
 		private void ms_sp_conect_Click(object sender, EventArgs e) {
 			try {
 				serialPort.Open();
+				timer1.Enabled=true;
 				ms_sp_conect.Enabled=false;
 				ms_sp_disconect.Enabled=true;
 			} catch(Exception ex) {
@@ -56,6 +57,7 @@ namespace ModBus {
 		private void ms_sp_disconect_Click(object sender, EventArgs e) {
 			try {
 				serialPort.Close();
+				timer1.Enabled=false;
 				ms_sp_conect.Enabled=true;
 				ms_sp_disconect.Enabled=false;
 			} catch(Exception ex) {
@@ -65,6 +67,28 @@ namespace ModBus {
 
 		private void Form1_FormClosing(object sender, FormClosingEventArgs e) {
 			if(serialPort.IsOpen) serialPort.Close();
+		}
+
+		private void btn_send_Click(object sender, EventArgs e) {
+			if(tb_send.Text.Length==0) return;
+			if(!serialPort.IsOpen) {
+				MessageBox.Show("Serial port not conected", "Send Error");
+				return;
+			}
+			serialPort.Write(tb_send.Text);
+		}
+
+		private void timer1_Tick(object sender, EventArgs e) {
+			if(serialPort.BytesToRead>0){
+				byte[] buffer = new byte[serialPort.BytesToRead];
+				serialPort.Read(buffer, 0, serialPort.BytesToRead);
+				//tb_receive.AppendText(buffer.ToArray().ToString());
+				string s = "";
+				foreach(char b in buffer)
+					s+=b.ToString();
+				tb_receive.AppendText(s);
+				//tb_receive.AppendText(serialPort.ReadLine());
+			}
 		}
 	}
 }
