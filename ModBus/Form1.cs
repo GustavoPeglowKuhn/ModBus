@@ -10,16 +10,25 @@ using System.Windows.Forms;
 
 namespace ModBus {
 	public partial class Form1 : Form {
+		
+		static string[] devices = { "broadcast", "kl25" };
+		enum e_devices : int { broadcast, kl25 };
+
+		enum mesages_num : int { broadcast, set_coins, read_cois };
 
 		//enum BaudRate { asd, assd};
 		static int[] iBaudRate = { 9600, 14400, 19200, 38400, 57600, 115200, 128000, 256000 };
-		static string[] sBaudRate = { "9600", "14400", "19200", "38400", "57600", "115200", "128000", "256000" };
+		//static string[] sBaudRate = { "9600", "14400", "19200", "38400", "57600", "115200", "128000", "256000" };
 		
 
 		public Form1() {
 			InitializeComponent();
 
-			ms_sp_baud_combobox.Items.AddRange(sBaudRate);
+			foreach (int i in iBaudRate)
+				ms_sp_baud_combobox.Items.Add(i.ToString());
+			//ms_sp_baud_combobox.Items.AddRange(sBaudRate);
+
+			lbl_dType.Text = "kl25";
 		}
 
 		private void ms_sp_port_combobox_DropDown(object sender, EventArgs e) {
@@ -85,9 +94,38 @@ namespace ModBus {
 				//tb_receive.AppendText(buffer.ToArray().ToString());
 				string s = "";
 				foreach(char b in buffer)
-					s+=b.ToString();
+					s+=""+b;
 				tb_receive.AppendText(s);
 				//tb_receive.AppendText(serialPort.ReadLine());
+			}
+		}
+
+        private void tb_receive_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+		private void nud_dType_ValueChanged(object sender, EventArgs e) {
+			if (nud_dType.Value == (int)e_devices.broadcast)
+				lbl_dType.Text = devices[(int)e_devices.broadcast];
+			else if (nud_dType.Value == (int)e_devices.kl25)
+				lbl_dType.Text = devices[(int)e_devices.kl25];
+			else
+                lbl_dType.Text = "unknow";
+		}
+
+		private void nud_mType_ValueChanged(object sender, EventArgs e) {
+			//se for a mensagem de broadcast desabilitar nud_dType
+			if (nud_mType.Value == (int)mesages_num.broadcast) {
+				nud_dType.Minimum = 0;
+				nud_dType.Value = 0;
+                nud_dType.Enabled = false;
+				lbl_dType.Text = devices[(int)e_devices.broadcast];
+			} else {
+				nud_dType.Minimum = 1;
+				nud_dType.Value = 1;
+                nud_dType.Enabled = true;
+				lbl_dType.Text = devices[1];
 			}
 		}
 	}
