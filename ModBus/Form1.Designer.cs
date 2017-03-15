@@ -23,241 +23,516 @@
 		/// the contents of this method with the code editor.
 		/// </summary>
 		private void InitializeComponent() {
-			this.components = new System.ComponentModel.Container();
-			this.serialPort = new System.IO.Ports.SerialPort(this.components);
-			this.tb_send = new System.Windows.Forms.TextBox();
-			this.tb_receive = new System.Windows.Forms.TextBox();
-			this.btn_send = new System.Windows.Forms.Button();
-			this.menuStrip1 = new System.Windows.Forms.MenuStrip();
-			this.ms_SerialPort = new System.Windows.Forms.ToolStripMenuItem();
-			this.ms_sp_port = new System.Windows.Forms.ToolStripMenuItem();
-			this.ms_sp_port_combobox = new System.Windows.Forms.ToolStripComboBox();
-			this.ms_sp_baud = new System.Windows.Forms.ToolStripMenuItem();
-			this.ms_sp_baud_combobox = new System.Windows.Forms.ToolStripComboBox();
-			this.ms_sp_conect = new System.Windows.Forms.ToolStripMenuItem();
-			this.ms_sp_disconect = new System.Windows.Forms.ToolStripMenuItem();
-			this.timer1 = new System.Windows.Forms.Timer(this.components);
-			this.nud_mType = new System.Windows.Forms.NumericUpDown();
-			this.lbl_mType = new System.Windows.Forms.Label();
-			this.label1 = new System.Windows.Forms.Label();
-			this.label2 = new System.Windows.Forms.Label();
-			this.lbl_dType = new System.Windows.Forms.Label();
-			this.nud_dType = new System.Windows.Forms.NumericUpDown();
-			this.gb_1 = new System.Windows.Forms.GroupBox();
-			this.menuStrip1.SuspendLayout();
-			((System.ComponentModel.ISupportInitialize)(this.nud_mType)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.nud_dType)).BeginInit();
-			this.SuspendLayout();
-			// 
-			// tb_send
-			// 
-			this.tb_send.Location = new System.Drawing.Point(393, 320);
-			this.tb_send.Name = "tb_send";
-			this.tb_send.Size = new System.Drawing.Size(66, 20);
-			this.tb_send.TabIndex = 0;
-			// 
-			// tb_receive
-			// 
-			this.tb_receive.Location = new System.Drawing.Point(542, 320);
-			this.tb_receive.Name = "tb_receive";
-			this.tb_receive.Size = new System.Drawing.Size(71, 20);
-			this.tb_receive.TabIndex = 1;
-			this.tb_receive.TextChanged += new System.EventHandler(this.tb_receive_TextChanged);
-			// 
-			// btn_send
-			// 
-			this.btn_send.Location = new System.Drawing.Point(465, 320);
-			this.btn_send.Name = "btn_send";
-			this.btn_send.Size = new System.Drawing.Size(71, 23);
-			this.btn_send.TabIndex = 2;
-			this.btn_send.Text = "Send";
-			this.btn_send.UseVisualStyleBackColor = true;
-			// 
-			// menuStrip1
-			// 
-			this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.components = new System.ComponentModel.Container();
+            this.serialPort = new System.IO.Ports.SerialPort(this.components);
+            this.tb_send = new System.Windows.Forms.TextBox();
+            this.tb_receive = new System.Windows.Forms.TextBox();
+            this.btn_send = new System.Windows.Forms.Button();
+            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
+            this.ms_SerialPort = new System.Windows.Forms.ToolStripMenuItem();
+            this.ms_sp_port = new System.Windows.Forms.ToolStripMenuItem();
+            this.ms_sp_port_combobox = new System.Windows.Forms.ToolStripComboBox();
+            this.ms_sp_baud = new System.Windows.Forms.ToolStripMenuItem();
+            this.ms_sp_baud_combobox = new System.Windows.Forms.ToolStripComboBox();
+            this.ms_sp_conect = new System.Windows.Forms.ToolStripMenuItem();
+            this.ms_sp_disconect = new System.Windows.Forms.ToolStripMenuItem();
+            this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.label1 = new System.Windows.Forms.Label();
+            this.lbl_dType = new System.Windows.Forms.Label();
+            this.nud_dType = new System.Windows.Forms.NumericUpDown();
+            this.lbl_temp = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
+            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.label2 = new System.Windows.Forms.Label();
+            this.nud_m1 = new System.Windows.Forms.NumericUpDown();
+            this.label4 = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
+            this.nud_m2 = new System.Windows.Forms.NumericUpDown();
+            this.label6 = new System.Windows.Forms.Label();
+            this.label7 = new System.Windows.Forms.Label();
+            this.nud_m3 = new System.Windows.Forms.NumericUpDown();
+            this.label8 = new System.Windows.Forms.Label();
+            this.label9 = new System.Windows.Forms.Label();
+            this.nud_m4 = new System.Windows.Forms.NumericUpDown();
+            this.label10 = new System.Windows.Forms.Label();
+            this.button1 = new System.Windows.Forms.Button();
+            this.button2 = new System.Windows.Forms.Button();
+            this.button3 = new System.Windows.Forms.Button();
+            this.button4 = new System.Windows.Forms.Button();
+            this.button5 = new System.Windows.Forms.Button();
+            this.button6 = new System.Windows.Forms.Button();
+            this.button7 = new System.Windows.Forms.Button();
+            this.button8 = new System.Windows.Forms.Button();
+            this.label11 = new System.Windows.Forms.Label();
+            this.label12 = new System.Windows.Forms.Label();
+            this.menuStrip1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.nud_dType)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nud_m1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nud_m2)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nud_m3)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nud_m4)).BeginInit();
+            this.SuspendLayout();
+            // 
+            // tb_send
+            // 
+            this.tb_send.Location = new System.Drawing.Point(393, 320);
+            this.tb_send.Name = "tb_send";
+            this.tb_send.Size = new System.Drawing.Size(66, 20);
+            this.tb_send.TabIndex = 0;
+            // 
+            // tb_receive
+            // 
+            this.tb_receive.Location = new System.Drawing.Point(542, 320);
+            this.tb_receive.Name = "tb_receive";
+            this.tb_receive.Size = new System.Drawing.Size(71, 20);
+            this.tb_receive.TabIndex = 1;
+            this.tb_receive.TextChanged += new System.EventHandler(this.tb_receive_TextChanged);
+            // 
+            // btn_send
+            // 
+            this.btn_send.Location = new System.Drawing.Point(465, 320);
+            this.btn_send.Name = "btn_send";
+            this.btn_send.Size = new System.Drawing.Size(71, 23);
+            this.btn_send.TabIndex = 2;
+            this.btn_send.Text = "Send";
+            this.btn_send.UseVisualStyleBackColor = true;
+            this.btn_send.Click += new System.EventHandler(this.btn_send_Click_1);
+            // 
+            // menuStrip1
+            // 
+            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.ms_SerialPort});
-			this.menuStrip1.Location = new System.Drawing.Point(0, 0);
-			this.menuStrip1.Name = "menuStrip1";
-			this.menuStrip1.Size = new System.Drawing.Size(627, 24);
-			this.menuStrip1.TabIndex = 3;
-			this.menuStrip1.Text = "menuStrip1";
-			// 
-			// ms_SerialPort
-			// 
-			this.ms_SerialPort.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
+            this.menuStrip1.Name = "menuStrip1";
+            this.menuStrip1.Size = new System.Drawing.Size(627, 24);
+            this.menuStrip1.TabIndex = 3;
+            this.menuStrip1.Text = "menuStrip1";
+            // 
+            // ms_SerialPort
+            // 
+            this.ms_SerialPort.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.ms_sp_port,
             this.ms_sp_baud,
             this.ms_sp_conect,
             this.ms_sp_disconect});
-			this.ms_SerialPort.Name = "ms_SerialPort";
-			this.ms_SerialPort.Size = new System.Drawing.Size(69, 20);
-			this.ms_SerialPort.Text = "SerialPort";
-			// 
-			// ms_sp_port
-			// 
-			this.ms_sp_port.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.ms_SerialPort.Name = "ms_SerialPort";
+            this.ms_SerialPort.Size = new System.Drawing.Size(69, 20);
+            this.ms_SerialPort.Text = "SerialPort";
+            this.ms_SerialPort.Click += new System.EventHandler(this.ms_SerialPort_Click);
+            // 
+            // ms_sp_port
+            // 
+            this.ms_sp_port.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.ms_sp_port_combobox});
-			this.ms_sp_port.Name = "ms_sp_port";
-			this.ms_sp_port.Size = new System.Drawing.Size(126, 22);
-			this.ms_sp_port.Text = "Port";
-			// 
-			// ms_sp_port_combobox
-			// 
-			this.ms_sp_port_combobox.Name = "ms_sp_port_combobox";
-			this.ms_sp_port_combobox.Size = new System.Drawing.Size(121, 23);
-			this.ms_sp_port_combobox.DropDown += new System.EventHandler(this.ms_sp_port_combobox_DropDown);
-			this.ms_sp_port_combobox.SelectedIndexChanged += new System.EventHandler(this.ms_sp_port_combobox_SelectedIndexChanged);
-			// 
-			// ms_sp_baud
-			// 
-			this.ms_sp_baud.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.ms_sp_port.Name = "ms_sp_port";
+            this.ms_sp_port.Size = new System.Drawing.Size(126, 22);
+            this.ms_sp_port.Text = "Port";
+            // 
+            // ms_sp_port_combobox
+            // 
+            this.ms_sp_port_combobox.Name = "ms_sp_port_combobox";
+            this.ms_sp_port_combobox.Size = new System.Drawing.Size(121, 23);
+            this.ms_sp_port_combobox.DropDown += new System.EventHandler(this.ms_sp_port_combobox_DropDown);
+            this.ms_sp_port_combobox.SelectedIndexChanged += new System.EventHandler(this.ms_sp_port_combobox_SelectedIndexChanged);
+            // 
+            // ms_sp_baud
+            // 
+            this.ms_sp_baud.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.ms_sp_baud_combobox});
-			this.ms_sp_baud.Name = "ms_sp_baud";
-			this.ms_sp_baud.Size = new System.Drawing.Size(126, 22);
-			this.ms_sp_baud.Text = "BaudRate";
-			// 
-			// ms_sp_baud_combobox
-			// 
-			this.ms_sp_baud_combobox.Name = "ms_sp_baud_combobox";
-			this.ms_sp_baud_combobox.Size = new System.Drawing.Size(121, 23);
-			this.ms_sp_baud_combobox.SelectedIndexChanged += new System.EventHandler(this.ms_sp_baud_combobox_SelectedIndexChanged);
-			// 
-			// ms_sp_conect
-			// 
-			this.ms_sp_conect.Name = "ms_sp_conect";
-			this.ms_sp_conect.Size = new System.Drawing.Size(126, 22);
-			this.ms_sp_conect.Text = "Conect";
-			this.ms_sp_conect.Click += new System.EventHandler(this.ms_sp_conect_Click);
-			// 
-			// ms_sp_disconect
-			// 
-			this.ms_sp_disconect.Enabled = false;
-			this.ms_sp_disconect.Name = "ms_sp_disconect";
-			this.ms_sp_disconect.Size = new System.Drawing.Size(126, 22);
-			this.ms_sp_disconect.Text = "Disconect";
-			this.ms_sp_disconect.Click += new System.EventHandler(this.ms_sp_disconect_Click);
-			// 
-			// timer1
-			// 
-			this.timer1.Interval = 500;
-			this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
-			// 
-			// nud_mType
-			// 
-			this.nud_mType.Location = new System.Drawing.Point(87, 27);
-			this.nud_mType.Maximum = new decimal(new int[] {
-            127,
-            0,
-            0,
-            0});
-			this.nud_mType.Name = "nud_mType";
-			this.nud_mType.Size = new System.Drawing.Size(120, 20);
-			this.nud_mType.TabIndex = 6;
-			this.nud_mType.Value = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-			this.nud_mType.ValueChanged += new System.EventHandler(this.nud_mType_ValueChanged);
-			// 
-			// lbl_mType
-			// 
-			this.lbl_mType.AutoSize = true;
-			this.lbl_mType.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.lbl_mType.Location = new System.Drawing.Point(213, 27);
-			this.lbl_mType.Name = "lbl_mType";
-			this.lbl_mType.Size = new System.Drawing.Size(50, 17);
-			this.lbl_mType.TabIndex = 7;
-			this.lbl_mType.Text = "m type";
-			// 
-			// label1
-			// 
-			this.label1.AutoSize = true;
-			this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.label1.Location = new System.Drawing.Point(357, 30);
-			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(53, 17);
-			this.label1.TabIndex = 9;
-			this.label1.Text = "device:";
-			// 
-			// label2
-			// 
-			this.label2.AutoSize = true;
-			this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.label2.Location = new System.Drawing.Point(12, 27);
-			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(69, 17);
-			this.label2.TabIndex = 10;
-			this.label2.Text = "message:";
-			// 
-			// lbl_dType
-			// 
-			this.lbl_dType.AutoSize = true;
-			this.lbl_dType.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.lbl_dType.Location = new System.Drawing.Point(542, 33);
-			this.lbl_dType.Name = "lbl_dType";
-			this.lbl_dType.Size = new System.Drawing.Size(49, 17);
-			this.lbl_dType.TabIndex = 11;
-			this.lbl_dType.Text = "device";
-			// 
-			// nud_dType
-			// 
-			this.nud_dType.Location = new System.Drawing.Point(416, 30);
-			this.nud_dType.Maximum = new decimal(new int[] {
+            this.ms_sp_baud.Name = "ms_sp_baud";
+            this.ms_sp_baud.Size = new System.Drawing.Size(126, 22);
+            this.ms_sp_baud.Text = "BaudRate";
+            // 
+            // ms_sp_baud_combobox
+            // 
+            this.ms_sp_baud_combobox.Name = "ms_sp_baud_combobox";
+            this.ms_sp_baud_combobox.Size = new System.Drawing.Size(121, 23);
+            this.ms_sp_baud_combobox.SelectedIndexChanged += new System.EventHandler(this.ms_sp_baud_combobox_SelectedIndexChanged);
+            // 
+            // ms_sp_conect
+            // 
+            this.ms_sp_conect.Name = "ms_sp_conect";
+            this.ms_sp_conect.Size = new System.Drawing.Size(126, 22);
+            this.ms_sp_conect.Text = "Conect";
+            this.ms_sp_conect.Click += new System.EventHandler(this.ms_sp_conect_Click);
+            // 
+            // ms_sp_disconect
+            // 
+            this.ms_sp_disconect.Enabled = false;
+            this.ms_sp_disconect.Name = "ms_sp_disconect";
+            this.ms_sp_disconect.Size = new System.Drawing.Size(126, 22);
+            this.ms_sp_disconect.Text = "Disconect";
+            this.ms_sp_disconect.Click += new System.EventHandler(this.ms_sp_disconect_Click);
+            // 
+            // timer1
+            // 
+            this.timer1.Interval = 500;
+            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.Location = new System.Drawing.Point(12, 24);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(53, 17);
+            this.label1.TabIndex = 9;
+            this.label1.Text = "device:";
+            // 
+            // lbl_dType
+            // 
+            this.lbl_dType.AutoSize = true;
+            this.lbl_dType.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lbl_dType.Location = new System.Drawing.Point(197, 27);
+            this.lbl_dType.Name = "lbl_dType";
+            this.lbl_dType.Size = new System.Drawing.Size(49, 17);
+            this.lbl_dType.TabIndex = 11;
+            this.lbl_dType.Text = "device";
+            // 
+            // nud_dType
+            // 
+            this.nud_dType.Location = new System.Drawing.Point(71, 24);
+            this.nud_dType.Maximum = new decimal(new int[] {
             255,
             0,
             0,
             0});
-			this.nud_dType.Minimum = new decimal(new int[] {
+            this.nud_dType.Minimum = new decimal(new int[] {
             1,
             0,
             0,
             0});
-			this.nud_dType.Name = "nud_dType";
-			this.nud_dType.Size = new System.Drawing.Size(120, 20);
-			this.nud_dType.TabIndex = 8;
-			this.nud_dType.Value = new decimal(new int[] {
+            this.nud_dType.Name = "nud_dType";
+            this.nud_dType.Size = new System.Drawing.Size(120, 20);
+            this.nud_dType.TabIndex = 8;
+            this.nud_dType.Value = new decimal(new int[] {
             1,
             0,
             0,
             0});
-			this.nud_dType.ValueChanged += new System.EventHandler(this.nud_dType_ValueChanged);
-			// 
-			// gb_1
-			// 
-			this.gb_1.Location = new System.Drawing.Point(13, 56);
-			this.gb_1.Name = "gb_1";
-			this.gb_1.Size = new System.Drawing.Size(600, 163);
-			this.gb_1.TabIndex = 12;
-			this.gb_1.TabStop = false;
-			// 
-			// Form1
-			// 
-			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(627, 352);
-			this.Controls.Add(this.gb_1);
-			this.Controls.Add(this.lbl_dType);
-			this.Controls.Add(this.label2);
-			this.Controls.Add(this.label1);
-			this.Controls.Add(this.nud_dType);
-			this.Controls.Add(this.lbl_mType);
-			this.Controls.Add(this.nud_mType);
-			this.Controls.Add(this.btn_send);
-			this.Controls.Add(this.tb_receive);
-			this.Controls.Add(this.tb_send);
-			this.Controls.Add(this.menuStrip1);
-			this.MainMenuStrip = this.menuStrip1;
-			this.Name = "Form1";
-			this.Text = "ModBus - Master of Puppets";
-			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
-			this.menuStrip1.ResumeLayout(false);
-			this.menuStrip1.PerformLayout();
-			((System.ComponentModel.ISupportInitialize)(this.nud_mType)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.nud_dType)).EndInit();
-			this.ResumeLayout(false);
-			this.PerformLayout();
+            this.nud_dType.ValueChanged += new System.EventHandler(this.nud_dType_ValueChanged);
+            // 
+            // lbl_temp
+            // 
+            this.lbl_temp.AutoSize = true;
+            this.lbl_temp.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lbl_temp.Location = new System.Drawing.Point(12, 75);
+            this.lbl_temp.Name = "lbl_temp";
+            this.lbl_temp.Size = new System.Drawing.Size(94, 17);
+            this.lbl_temp.TabIndex = 12;
+            this.lbl_temp.Text = "Temperatura:";
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label3.Location = new System.Drawing.Point(218, 75);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(23, 17);
+            this.label3.TabIndex = 14;
+            this.label3.Text = "°C";
+            // 
+            // textBox1
+            // 
+            this.textBox1.Location = new System.Drawing.Point(112, 72);
+            this.textBox1.Name = "textBox1";
+            this.textBox1.Size = new System.Drawing.Size(100, 20);
+            this.textBox1.TabIndex = 15;
+            this.textBox1.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label2.Location = new System.Drawing.Point(12, 121);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(79, 17);
+            this.label2.TabIndex = 16;
+            this.label2.Text = "Tempo M1:";
+            // 
+            // nud_m1
+            // 
+            this.nud_m1.Location = new System.Drawing.Point(98, 121);
+            this.nud_m1.Maximum = new decimal(new int[] {
+            65535,
+            0,
+            0,
+            0});
+            this.nud_m1.Name = "nud_m1";
+            this.nud_m1.Size = new System.Drawing.Size(120, 20);
+            this.nud_m1.TabIndex = 17;
+            this.nud_m1.Value = new decimal(new int[] {
+            50,
+            0,
+            0,
+            0});
+            this.nud_m1.ValueChanged += new System.EventHandler(this.nud_m1_ValueChanged);
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label4.Location = new System.Drawing.Point(224, 124);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(72, 17);
+            this.label4.TabIndex = 18;
+            this.label4.Text = "Segundos";
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label5.Location = new System.Drawing.Point(224, 150);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(72, 17);
+            this.label5.TabIndex = 21;
+            this.label5.Text = "Segundos";
+            // 
+            // nud_m2
+            // 
+            this.nud_m2.Location = new System.Drawing.Point(98, 147);
+            this.nud_m2.Maximum = new decimal(new int[] {
+            65535,
+            0,
+            0,
+            0});
+            this.nud_m2.Name = "nud_m2";
+            this.nud_m2.Size = new System.Drawing.Size(120, 20);
+            this.nud_m2.TabIndex = 20;
+            this.nud_m2.Value = new decimal(new int[] {
+            50,
+            0,
+            0,
+            0});
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label6.Location = new System.Drawing.Point(12, 147);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(79, 17);
+            this.label6.TabIndex = 19;
+            this.label6.Text = "Tempo M2:";
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label7.Location = new System.Drawing.Point(224, 176);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(72, 17);
+            this.label7.TabIndex = 24;
+            this.label7.Text = "Segundos";
+            // 
+            // nud_m3
+            // 
+            this.nud_m3.Location = new System.Drawing.Point(98, 173);
+            this.nud_m3.Maximum = new decimal(new int[] {
+            65535,
+            0,
+            0,
+            0});
+            this.nud_m3.Name = "nud_m3";
+            this.nud_m3.Size = new System.Drawing.Size(120, 20);
+            this.nud_m3.TabIndex = 23;
+            this.nud_m3.Value = new decimal(new int[] {
+            50,
+            0,
+            0,
+            0});
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label8.Location = new System.Drawing.Point(12, 173);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(79, 17);
+            this.label8.TabIndex = 22;
+            this.label8.Text = "Tempo M3:";
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label9.Location = new System.Drawing.Point(224, 202);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(72, 17);
+            this.label9.TabIndex = 27;
+            this.label9.Text = "Segundos";
+            // 
+            // nud_m4
+            // 
+            this.nud_m4.Location = new System.Drawing.Point(98, 199);
+            this.nud_m4.Maximum = new decimal(new int[] {
+            65535,
+            0,
+            0,
+            0});
+            this.nud_m4.Name = "nud_m4";
+            this.nud_m4.Size = new System.Drawing.Size(120, 20);
+            this.nud_m4.TabIndex = 26;
+            this.nud_m4.Value = new decimal(new int[] {
+            50,
+            0,
+            0,
+            0});
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label10.Location = new System.Drawing.Point(12, 199);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(79, 17);
+            this.label10.TabIndex = 25;
+            this.label10.Text = "Tempo M4:";
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(303, 121);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(35, 23);
+            this.button1.TabIndex = 28;
+            this.button1.Text = "On";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
+            // button2
+            // 
+            this.button2.Location = new System.Drawing.Point(344, 121);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(35, 23);
+            this.button2.TabIndex = 29;
+            this.button2.Text = "Off";
+            this.button2.UseVisualStyleBackColor = true;
+            // 
+            // button3
+            // 
+            this.button3.Location = new System.Drawing.Point(343, 147);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(35, 23);
+            this.button3.TabIndex = 31;
+            this.button3.Text = "Off";
+            this.button3.UseVisualStyleBackColor = true;
+            // 
+            // button4
+            // 
+            this.button4.Location = new System.Drawing.Point(302, 147);
+            this.button4.Name = "button4";
+            this.button4.Size = new System.Drawing.Size(35, 23);
+            this.button4.TabIndex = 30;
+            this.button4.Text = "On";
+            this.button4.UseVisualStyleBackColor = true;
+            // 
+            // button5
+            // 
+            this.button5.Location = new System.Drawing.Point(343, 173);
+            this.button5.Name = "button5";
+            this.button5.Size = new System.Drawing.Size(35, 23);
+            this.button5.TabIndex = 33;
+            this.button5.Text = "Off";
+            this.button5.UseVisualStyleBackColor = true;
+            // 
+            // button6
+            // 
+            this.button6.Location = new System.Drawing.Point(302, 173);
+            this.button6.Name = "button6";
+            this.button6.Size = new System.Drawing.Size(35, 23);
+            this.button6.TabIndex = 32;
+            this.button6.Text = "On";
+            this.button6.UseVisualStyleBackColor = true;
+            // 
+            // button7
+            // 
+            this.button7.Location = new System.Drawing.Point(343, 199);
+            this.button7.Name = "button7";
+            this.button7.Size = new System.Drawing.Size(35, 23);
+            this.button7.TabIndex = 35;
+            this.button7.Text = "Off";
+            this.button7.UseVisualStyleBackColor = true;
+            // 
+            // button8
+            // 
+            this.button8.Location = new System.Drawing.Point(302, 199);
+            this.button8.Name = "button8";
+            this.button8.Size = new System.Drawing.Size(35, 23);
+            this.button8.TabIndex = 34;
+            this.button8.Text = "On";
+            this.button8.UseVisualStyleBackColor = true;
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label11.Location = new System.Drawing.Point(385, 124);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(52, 17);
+            this.label11.TabIndex = 36;
+            this.label11.Text = "Status:";
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label12.Location = new System.Drawing.Point(432, 124);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(52, 17);
+            this.label12.TabIndex = 37;
+            this.label12.Text = "Status:";
+            // 
+            // Form1
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.ClientSize = new System.Drawing.Size(627, 352);
+            this.Controls.Add(this.label12);
+            this.Controls.Add(this.label11);
+            this.Controls.Add(this.button7);
+            this.Controls.Add(this.button8);
+            this.Controls.Add(this.button5);
+            this.Controls.Add(this.button6);
+            this.Controls.Add(this.button3);
+            this.Controls.Add(this.button4);
+            this.Controls.Add(this.button2);
+            this.Controls.Add(this.button1);
+            this.Controls.Add(this.label9);
+            this.Controls.Add(this.nud_m4);
+            this.Controls.Add(this.label10);
+            this.Controls.Add(this.label7);
+            this.Controls.Add(this.nud_m3);
+            this.Controls.Add(this.label8);
+            this.Controls.Add(this.label5);
+            this.Controls.Add(this.nud_m2);
+            this.Controls.Add(this.label6);
+            this.Controls.Add(this.label4);
+            this.Controls.Add(this.nud_m1);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.textBox1);
+            this.Controls.Add(this.label3);
+            this.Controls.Add(this.lbl_temp);
+            this.Controls.Add(this.lbl_dType);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.nud_dType);
+            this.Controls.Add(this.btn_send);
+            this.Controls.Add(this.tb_receive);
+            this.Controls.Add(this.tb_send);
+            this.Controls.Add(this.menuStrip1);
+            this.MainMenuStrip = this.menuStrip1;
+            this.Name = "Form1";
+            this.Text = "ModBus - Master of Puppets";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
+            this.Load += new System.EventHandler(this.Form1_Load);
+            this.menuStrip1.ResumeLayout(false);
+            this.menuStrip1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.nud_dType)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nud_m1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nud_m2)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nud_m3)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nud_m4)).EndInit();
+            this.ResumeLayout(false);
+            this.PerformLayout();
 
 		}
 
@@ -276,13 +551,34 @@
 		private System.Windows.Forms.ToolStripMenuItem ms_sp_conect;
 		private System.Windows.Forms.ToolStripMenuItem ms_sp_disconect;
         private System.Windows.Forms.Timer timer1;
-        private System.Windows.Forms.NumericUpDown nud_mType;
-        private System.Windows.Forms.Label lbl_mType;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label lbl_dType;
         private System.Windows.Forms.NumericUpDown nud_dType;
-        private System.Windows.Forms.GroupBox gb_1;
+        private System.Windows.Forms.Label lbl_temp;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.NumericUpDown nud_m1;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.NumericUpDown nud_m2;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.NumericUpDown nud_m3;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.NumericUpDown nud_m4;
+        private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.Button button4;
+        private System.Windows.Forms.Button button5;
+        private System.Windows.Forms.Button button6;
+        private System.Windows.Forms.Button button7;
+        private System.Windows.Forms.Button button8;
+        private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.Label label12;
 	}
 }
 

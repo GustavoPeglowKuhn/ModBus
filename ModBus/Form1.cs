@@ -114,19 +114,28 @@ namespace ModBus {
                 lbl_dType.Text = "unknow";
 		}
 
-		private void nud_mType_ValueChanged(object sender, EventArgs e) {
-			//se for a mensagem de broadcast desabilitar nud_dType
-			if (nud_mType.Value == (int)mesages_num.broadcast) {
-				nud_dType.Minimum = 0;
-				nud_dType.Value = 0;
-                nud_dType.Enabled = false;
-				lbl_dType.Text = devices[(int)e_devices.broadcast];
-			} else {
-				nud_dType.Minimum = 1;
-				nud_dType.Value = 1;
-                nud_dType.Enabled = true;
-				lbl_dType.Text = devices[1];
-			}
-		}
+        private void btn_send_Click_1(object sender, EventArgs e) {
+
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e) {
+
+        }
+
+        private void Form1_Load(object sender, EventArgs e) {
+
+        }
+
+        private void nud_m1_ValueChanged(object sender, EventArgs e) {
+
+        }
+
+        private void button1_Click(object sender, EventArgs e) {
+
+        }
+
+        private void ms_SerialPort_Click(object sender, EventArgs e) {
+
+        }
 	}
 }
