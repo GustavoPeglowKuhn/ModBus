@@ -10,11 +10,12 @@ using System.Windows.Forms;
 
 namespace ModBus {
 	public partial class Form1 : Form {
-		
-		static string[] devices = { "broadcast", "kl25" };
-		enum e_devices : int { broadcast, kl25 };
+		ModBusPort modBusPort = new ModBusPort();
 
-		enum mesages_num : int { broadcast, set_coins, read_cois };
+		static string[] devices = { "broadcast", "kl25" };
+		enum e_devices : byte { broadcast=0, kl25=1 };
+
+		enum mesages_num : byte { broadcast, set_coins, read_cois };	//search the real values
 
 		//enum BaudRate { asd, assd};
 		static int[] iBaudRate = { 9600, 14400, 19200, 38400, 57600, 115200, 128000, 256000 };
@@ -28,6 +29,29 @@ namespace ModBus {
 				ms_sp_baud_combobox.Items.Add(i.ToString());
 			//ms_sp_baud_combobox.Items.AddRange(sBaudRate);
 			lbl_dType.Text = "kl25";
+
+			modBusPort.t.Elapsed+=delegate {
+				InterpretaMensagem();
+			};
+		}
+
+		public void InterpretaMensagem() {
+			Message mes;
+			try {
+				mes = modBusPort.ReadMesssage();
+			} catch(CrcError) {
+				//CRC error
+				//make a log of with time and message type
+				return;
+			}
+			if(mes.GetDevice()!=(byte)e_devices.kl25) {
+				switch(mes.GetMessageType()) {
+					case (byte)mesages_num.read_cois:
+						//code here;
+					break;
+					//case 
+				}
+			}
 		}
 
 		private void ms_sp_port_combobox_DropDown(object sender, EventArgs e) {

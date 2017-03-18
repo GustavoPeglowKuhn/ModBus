@@ -5,7 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace ModBus {
-	class Message {
+	public class Message {
+		enum MessageType : byte { broadcast }
+
 		private List<byte> message;
 
 		public Message(byte device, byte mType, List<byte> body) {
@@ -28,6 +30,12 @@ namespace ModBus {
 
 		public Message(byte[] all) {
 			message.AddRange(all);
+			if(!CheckCrc())
+				throw new CrcError("CRC diferente");
+		}
+
+		public Message(List<byte> all) {
+			message = all;
 			if(!CheckCrc())
 				throw new CrcError("CRC diferente");
 		}

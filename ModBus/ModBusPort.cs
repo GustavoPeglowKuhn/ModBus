@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ModBus {
 	class ModBusPort : System.IO.Ports.SerialPort {
-		System.Timers.Timer t;
+		public System.Timers.Timer t;
 		List<byte> buffer;
 		public ModBusPort() {
 			buffer=new List<byte>();
@@ -41,13 +41,7 @@ namespace ModBus {
 		}
 
 		public Message ReadMesssage() {
-			//read buffer;
-			
-
-			Message res = new Message(0, 0, new List<byte>());
-
-			if(!res.CheckCrc()) throw new CrcError();
-
+			Message res = new Message(buffer);  //can throw CrcError exception
 			return res;
 		}
 	}
