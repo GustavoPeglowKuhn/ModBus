@@ -13,16 +13,17 @@ namespace ModBus {
         Motor() {
             t.Enabled = false;
             t.Interval = 500;   //mudar valor depois
-            //t.Tick += new System.EventHandler(this.t_Tick);
+			t.Elapsed+=delegate {
+				t_Tick();
+			};
         }
 
         public void ligar(int time){
             star_Time = time;
             t.Enabled = true;
-
         }
 
-        private void t_Tick(object sender, EventArgs e) {
+        private void t_Tick() {
             //ler tempo do motor nokit
             // current_Time = "read_Time" 
             if (current_Time >= star_Time) {
@@ -31,6 +32,5 @@ namespace ModBus {
                 t.Enabled = false;
             }
         }
-        
     }
 }

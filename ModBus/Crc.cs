@@ -15,6 +15,13 @@ namespace ModBus {
 	}
 
 	class CrcError : Exception {
+		public CrcError() {
+		}
 
+		public CrcError(string message) : base(message){
+		}
+
+		public CrcError(string message, Exception inner) : base(message, inner){
+		}
 	}
 }

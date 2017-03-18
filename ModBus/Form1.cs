@@ -27,7 +27,6 @@ namespace ModBus {
 			foreach (int i in iBaudRate)
 				ms_sp_baud_combobox.Items.Add(i.ToString());
 			//ms_sp_baud_combobox.Items.AddRange(sBaudRate);
-
 			lbl_dType.Text = "kl25";
 		}
 
@@ -58,7 +57,7 @@ namespace ModBus {
 				timer1.Enabled=true;
 				ms_sp_conect.Enabled=false;
 				ms_sp_disconect.Enabled=true;
-			} catch(Exception ex) {
+			} catch(Exception) {
 				MessageBox.Show("Unable to conect to "+serialPort.PortName+" at "+serialPort.BaudRate+" kbps, select a valid port", "Conect Error");
 			}
 		}
@@ -69,7 +68,7 @@ namespace ModBus {
 				timer1.Enabled=false;
 				ms_sp_conect.Enabled=true;
 				ms_sp_disconect.Enabled=false;
-			} catch(Exception ex) {
+			} catch(Exception) {
 				MessageBox.Show("Unable to disconect this serial port", "Disconect Error");
 			}
 		}
@@ -78,14 +77,14 @@ namespace ModBus {
 			if(serialPort.IsOpen) serialPort.Close();
 		}
 
-		private void btn_send_Click(object sender, EventArgs e) {
+		/*private void btn_send_Click(object sender, EventArgs e) {
 			if(tb_send.Text.Length==0) return;
 			if(!serialPort.IsOpen) {
 				MessageBox.Show("Serial port not conected", "Send Error");
 				return;
 			}
 			serialPort.Write(tb_send.Text);
-		}
+		}*/
 
 		private void timer1_Tick(object sender, EventArgs e) {
 			if(serialPort.BytesToRead>0){
@@ -100,11 +99,6 @@ namespace ModBus {
 			}
 		}
 
-        private void tb_receive_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
 		private void nud_dType_ValueChanged(object sender, EventArgs e) {
 			if (nud_dType.Value == (int)e_devices.broadcast)
 				lbl_dType.Text = devices[(int)e_devices.broadcast];
@@ -114,15 +108,7 @@ namespace ModBus {
                 lbl_dType.Text = "unknow";
 		}
 
-        private void btn_send_Click_1(object sender, EventArgs e) {
-
-        }
-
         private void textBox1_TextChanged(object sender, EventArgs e) {
-
-        }
-
-        private void Form1_Load(object sender, EventArgs e) {
 
         }
 

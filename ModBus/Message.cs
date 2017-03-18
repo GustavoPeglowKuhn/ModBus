@@ -26,6 +26,12 @@ namespace ModBus {
 			message.AddRange(crc);
 		}
 
+		public Message(byte[] all) {
+			message.AddRange(all);
+			if(!CheckCrc())
+				throw new CrcError("CRC diferente");
+		}
+
 		public byte GetDevice() {
 			return message[0];
 		}
@@ -38,7 +44,7 @@ namespace ModBus {
 
 		public bool CheckCrc() {
 			byte[] crc = Crc.Calculate(message.GetRange(0, message.Count-2));
-			if(crc[0]==message[message.Count-1]&&crc[1]==message[message.Count])    //Criar algoritimo do crc
+			if(crc[0]==message[message.Count-2] && crc[1]==message[message.Count-1])    //Criar algoritimo do crc
 				return true;
 			return false;
 		}
