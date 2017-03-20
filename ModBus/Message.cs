@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ModBus {
 	public class Message {
-		enum MessageType : byte { broadcast }
+		public enum MessageType : byte { broadcast }
 
 		private List<byte> message;
 
@@ -29,13 +29,15 @@ namespace ModBus {
 		}
 
 		public Message(byte[] all) {
-			message.AddRange(all);
+			message.AddRange(all);	//ver se funciona como ponteiro
 			if(!CheckCrc())
 				throw new CrcError("CRC diferente");
 		}
 
 		public Message(List<byte> all) {
-			message = all;
+			//message = all;			//assim funciona como ponteiro (c++ é muito mais facil de er quando é ponteiro e quando nao é :/)
+			message=new List<byte>();
+			message.AddRange(all);		//
 			if(!CheckCrc())
 				throw new CrcError("CRC diferente");
 		}

@@ -11,6 +11,7 @@ using System.Windows.Forms;
 namespace ModBus {
 	public partial class Form1 : Form {
 		ModBusPort modBusPort = new ModBusPort();
+		Motor[] motors = new Motor[3];		// o quarto motor é controlado pelo kit (assim espero)
 
 		static string[] devices = { "broadcast", "kl25" };
 		enum e_devices : byte { broadcast=0, kl25=1 };
@@ -33,23 +34,31 @@ namespace ModBus {
 			modBusPort.t.Elapsed+=delegate {
 				InterpretaMensagem();
 			};
+
+			//System.IO.Ports.SerialPort sp = new System.IO.Ports.SerialPort();			
 		}
 
 		public void InterpretaMensagem() {
 			Message mes;
 			try {
 				mes = modBusPort.ReadMesssage();
-			} catch(CrcError) {
+			} catch(CrcError ex) {
 				//CRC error
 				//make a log of with time and message type
 				return;
+			} catch(ModBusReceiveTimeOut ex) {
+				//message time out error
+				//make a log of with time and message type
+				return;
 			}
-			if(mes.GetDevice()!=(byte)e_devices.kl25) {
+			if(mes.GetDevice()==(byte)e_devices.kl25) {
 				switch(mes.GetMessageType()) {
 					case (byte)mesages_num.read_cois:
 						//code here;
 					break;
-					//case 
+					case (byte)Message.MessageType.broadcast:
+						//code here too;
+					break;
 				}
 			}
 		}
@@ -65,30 +74,34 @@ namespace ModBus {
 			if(ms_sp_port_combobox.Items.Count==0) {
 				MessageBox.Show("Conect any serial device!", "No serial ports found");
 			}
-			serialPort.PortName=ms_sp_port_combobox.SelectedItem.ToString();
-
-			tb_receive.Text="Debug - "+serialPort.PortName;
+			modBusPort.PortName=ms_sp_port_combobox.SelectedItem.ToString();
+			//serialPort.PortName=ms_sp_port_combobox.SelectedItem.ToString();
+			//tb_receive.Text="Debug - "+serialPort.PortName;
 		}
 
 		private void ms_sp_baud_combobox_SelectedIndexChanged(object sender, EventArgs e) {
-			serialPort.BaudRate = iBaudRate[ms_sp_baud_combobox.SelectedIndex];
+			modBusPort.BaudRate=iBaudRate[ms_sp_baud_combobox.SelectedIndex];
+			//serialPort.BaudRate = iBaudRate[ms_sp_baud_combobox.SelectedIndex];
 			//tb_receive.Text="Debug - "+serialPort.BaudRate.ToString();
 		}
 
 		private void ms_sp_conect_Click(object sender, EventArgs e) {
 			try {
-				serialPort.Open();
-				timer1.Enabled=true;
+				modBusPort.Open();
+				//serialPort.Open();
+				//timer1.Enabled=true;
 				ms_sp_conect.Enabled=false;
 				ms_sp_disconect.Enabled=true;
 			} catch(Exception) {
-				MessageBox.Show("Unable to conect to "+serialPort.PortName+" at "+serialPort.BaudRate+" kbps, select a valid port", "Conect Error");
+				//MessageBox.Show("Unable to conect to "+serialPort.PortName+" at "+serialPort.BaudRate+" kbps, select a valid port", "Conect Error");
+				MessageBox.Show("Unable to conect to "+modBusPort.PortName+" at "+modBusPort.BaudRate+" kbps, select a valid ModBusPort", "Conect Error");
 			}
 		}
 
 		private void ms_sp_disconect_Click(object sender, EventArgs e) {
 			try {
-				serialPort.Close();
+				modBusPort.Close();
+				//serialPort.Close();
 				timer1.Enabled=false;
 				ms_sp_conect.Enabled=true;
 				ms_sp_disconect.Enabled=false;
@@ -98,7 +111,8 @@ namespace ModBus {
 		}
 
 		private void Form1_FormClosing(object sender, FormClosingEventArgs e) {
-			if(serialPort.IsOpen) serialPort.Close();
+			if(modBusPort.IsOpen) modBusPort.Close();
+			//if(serialPort.IsOpen) serialPort.Close();
 		}
 
 		/*private void btn_send_Click(object sender, EventArgs e) {
@@ -111,7 +125,7 @@ namespace ModBus {
 		}*/
 
 		private void timer1_Tick(object sender, EventArgs e) {
-			if(serialPort.BytesToRead>0){
+			/*if(serialPort.BytesToRead>0){
 				byte[] buffer = new byte[serialPort.BytesToRead];
 				serialPort.Read(buffer, 0, serialPort.BytesToRead);
 				//tb_receive.AppendText(buffer.ToArray().ToString());
@@ -120,7 +134,7 @@ namespace ModBus {
 					s+=""+b;
 				tb_receive.AppendText(s);
 				//tb_receive.AppendText(serialPort.ReadLine());
-			}
+			}*/
 		}
 
 		private void nud_dType_ValueChanged(object sender, EventArgs e) {

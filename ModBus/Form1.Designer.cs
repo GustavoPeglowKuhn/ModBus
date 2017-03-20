@@ -24,10 +24,6 @@
 		/// </summary>
 		private void InitializeComponent() {
 			this.components = new System.ComponentModel.Container();
-			this.serialPort = new System.IO.Ports.SerialPort(this.components);
-			this.tb_send = new System.Windows.Forms.TextBox();
-			this.tb_receive = new System.Windows.Forms.TextBox();
-			this.btn_send = new System.Windows.Forms.Button();
 			this.menuStrip1 = new System.Windows.Forms.MenuStrip();
 			this.ms_SerialPort = new System.Windows.Forms.ToolStripMenuItem();
 			this.ms_sp_port = new System.Windows.Forms.ToolStripMenuItem();
@@ -76,29 +72,6 @@
 			((System.ComponentModel.ISupportInitialize)(this.nud_m3)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.nud_m4)).BeginInit();
 			this.SuspendLayout();
-			// 
-			// tb_send
-			// 
-			this.tb_send.Location = new System.Drawing.Point(393, 320);
-			this.tb_send.Name = "tb_send";
-			this.tb_send.Size = new System.Drawing.Size(66, 20);
-			this.tb_send.TabIndex = 0;
-			// 
-			// tb_receive
-			// 
-			this.tb_receive.Location = new System.Drawing.Point(542, 320);
-			this.tb_receive.Name = "tb_receive";
-			this.tb_receive.Size = new System.Drawing.Size(71, 20);
-			this.tb_receive.TabIndex = 1;
-			// 
-			// btn_send
-			// 
-			this.btn_send.Location = new System.Drawing.Point(465, 320);
-			this.btn_send.Name = "btn_send";
-			this.btn_send.Size = new System.Drawing.Size(71, 23);
-			this.btn_send.TabIndex = 2;
-			this.btn_send.Text = "Send";
-			this.btn_send.UseVisualStyleBackColor = true;
 			// 
 			// menuStrip1
 			// 
@@ -565,9 +538,6 @@
 			this.Controls.Add(this.lbl_dType);
 			this.Controls.Add(this.label1);
 			this.Controls.Add(this.nud_dType);
-			this.Controls.Add(this.btn_send);
-			this.Controls.Add(this.tb_receive);
-			this.Controls.Add(this.tb_send);
 			this.Controls.Add(this.menuStrip1);
 			this.MainMenuStrip = this.menuStrip1;
 			this.Name = "Form1";
@@ -586,11 +556,6 @@
 		}
 
 		#endregion
-
-		private System.IO.Ports.SerialPort serialPort;
-		private System.Windows.Forms.TextBox tb_send;
-		private System.Windows.Forms.TextBox tb_receive;
-		private System.Windows.Forms.Button btn_send;
 		private System.Windows.Forms.MenuStrip menuStrip1;
 		private System.Windows.Forms.ToolStripMenuItem ms_SerialPort;
 		private System.Windows.Forms.ToolStripMenuItem ms_sp_port;
