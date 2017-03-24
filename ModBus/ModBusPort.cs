@@ -24,7 +24,7 @@ namespace ModBus {
 				byte[] smallBuffer = new byte[BytesToRead];
 				Read(smallBuffer, 0, BytesToRead);
 				buffer.AddRange(smallBuffer);
-				if(buffer.Count()>256) {
+				if(buffer.Count()>255) {
 					buffer.Clear();
 					DiscardInBuffer();
 					throw new ModBusFrameOerFlow("more than 256 byte per frame");
@@ -76,7 +76,7 @@ namespace ModBus {
 				int d = i==0 ? -1 : buffer[0];
 				int m = i<2 ? -1 : buffer[1];
 				DiscardInBuffer();
-				buffer.Clear();		//se a mensagem é inalida todo conteudo do buffer deve ser descartado!
+				buffer.Clear();		//se a mensagem é invalida todo conteudo do buffer deve ser descartado!
 				throw new ModBusReceiveTimeOut("Incomplete message", d, m);
 			}
 			Message res = new Message(buffer);  //can throw CrcError exception

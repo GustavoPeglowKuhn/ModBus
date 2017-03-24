@@ -23,7 +23,6 @@
 		/// the contents of this method with the code editor.
 		/// </summary>
 		private void InitializeComponent() {
-			this.components = new System.ComponentModel.Container();
 			this.menuStrip1 = new System.Windows.Forms.MenuStrip();
 			this.ms_SerialPort = new System.Windows.Forms.ToolStripMenuItem();
 			this.ms_sp_port = new System.Windows.Forms.ToolStripMenuItem();
@@ -32,13 +31,12 @@
 			this.ms_sp_baud_combobox = new System.Windows.Forms.ToolStripComboBox();
 			this.ms_sp_conect = new System.Windows.Forms.ToolStripMenuItem();
 			this.ms_sp_disconect = new System.Windows.Forms.ToolStripMenuItem();
-			this.timer1 = new System.Windows.Forms.Timer(this.components);
 			this.label1 = new System.Windows.Forms.Label();
 			this.lbl_dType = new System.Windows.Forms.Label();
 			this.nud_dType = new System.Windows.Forms.NumericUpDown();
 			this.lbl_temp = new System.Windows.Forms.Label();
 			this.label3 = new System.Windows.Forms.Label();
-			this.textBox1 = new System.Windows.Forms.TextBox();
+			this.tb_set_tem = new System.Windows.Forms.TextBox();
 			this.label2 = new System.Windows.Forms.Label();
 			this.nud_m1 = new System.Windows.Forms.NumericUpDown();
 			this.label4 = new System.Windows.Forms.Label();
@@ -65,6 +63,9 @@
 			this.label15 = new System.Windows.Forms.Label();
 			this.lbl_status_m4 = new System.Windows.Forms.Label();
 			this.label14 = new System.Windows.Forms.Label();
+			this.tb_cur_tem = new System.Windows.Forms.TextBox();
+			this.label12 = new System.Windows.Forms.Label();
+			this.label16 = new System.Windows.Forms.Label();
 			this.menuStrip1.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.nud_dType)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.nud_m1)).BeginInit();
@@ -93,7 +94,6 @@
 			this.ms_SerialPort.Name = "ms_SerialPort";
 			this.ms_SerialPort.Size = new System.Drawing.Size(69, 20);
 			this.ms_SerialPort.Text = "SerialPort";
-			this.ms_SerialPort.Click += new System.EventHandler(this.ms_SerialPort_Click);
 			// 
 			// ms_sp_port
 			// 
@@ -139,11 +139,6 @@
 			this.ms_sp_disconect.Text = "Disconect";
 			this.ms_sp_disconect.Click += new System.EventHandler(this.ms_sp_disconect_Click);
 			// 
-			// timer1
-			// 
-			this.timer1.Interval = 500;
-			this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
-			// 
 			// label1
 			// 
 			this.label1.AutoSize = true;
@@ -172,11 +167,6 @@
             0,
             0,
             0});
-			this.nud_dType.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
 			this.nud_dType.Name = "nud_dType";
 			this.nud_dType.Size = new System.Drawing.Size(120, 20);
 			this.nud_dType.TabIndex = 8;
@@ -191,30 +181,29 @@
 			// 
 			this.lbl_temp.AutoSize = true;
 			this.lbl_temp.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.lbl_temp.Location = new System.Drawing.Point(340, 153);
+			this.lbl_temp.Location = new System.Drawing.Point(12, 180);
 			this.lbl_temp.Name = "lbl_temp";
-			this.lbl_temp.Size = new System.Drawing.Size(94, 17);
+			this.lbl_temp.Size = new System.Drawing.Size(156, 17);
 			this.lbl_temp.TabIndex = 12;
-			this.lbl_temp.Text = "Temperatura:";
+			this.lbl_temp.Text = "Temperatura desejada:";
 			// 
 			// label3
 			// 
 			this.label3.AutoSize = true;
 			this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.label3.Location = new System.Drawing.Point(500, 153);
+			this.label3.Location = new System.Drawing.Point(234, 179);
 			this.label3.Name = "label3";
 			this.label3.Size = new System.Drawing.Size(23, 17);
 			this.label3.TabIndex = 14;
 			this.label3.Text = "°C";
 			// 
-			// textBox1
+			// tb_set_tem
 			// 
-			this.textBox1.Location = new System.Drawing.Point(440, 153);
-			this.textBox1.Name = "textBox1";
-			this.textBox1.Size = new System.Drawing.Size(54, 20);
-			this.textBox1.TabIndex = 15;
-			this.textBox1.Text = "25";
-			this.textBox1.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
+			this.tb_set_tem.Location = new System.Drawing.Point(174, 179);
+			this.tb_set_tem.Name = "tb_set_tem";
+			this.tb_set_tem.Size = new System.Drawing.Size(54, 20);
+			this.tb_set_tem.TabIndex = 15;
+			this.tb_set_tem.Text = "35";
 			// 
 			// label2
 			// 
@@ -242,7 +231,6 @@
             0,
             0,
             0});
-			this.nud_m1.ValueChanged += new System.EventHandler(this.nud_m1_ValueChanged);
 			// 
 			// label4
 			// 
@@ -367,17 +355,16 @@
 			// 
 			// button1
 			// 
-			this.button1.Location = new System.Drawing.Point(341, 75);
+			this.button1.Location = new System.Drawing.Point(398, 75);
 			this.button1.Name = "button1";
 			this.button1.Size = new System.Drawing.Size(35, 23);
 			this.button1.TabIndex = 28;
 			this.button1.Text = "On";
 			this.button1.UseVisualStyleBackColor = true;
-			this.button1.Click += new System.EventHandler(this.button1_Click);
 			// 
 			// button2
 			// 
-			this.button2.Location = new System.Drawing.Point(382, 75);
+			this.button2.Location = new System.Drawing.Point(439, 75);
 			this.button2.Name = "button2";
 			this.button2.Size = new System.Drawing.Size(35, 23);
 			this.button2.TabIndex = 29;
@@ -386,7 +373,7 @@
 			// 
 			// button3
 			// 
-			this.button3.Location = new System.Drawing.Point(381, 101);
+			this.button3.Location = new System.Drawing.Point(438, 101);
 			this.button3.Name = "button3";
 			this.button3.Size = new System.Drawing.Size(35, 23);
 			this.button3.TabIndex = 31;
@@ -395,7 +382,7 @@
 			// 
 			// button4
 			// 
-			this.button4.Location = new System.Drawing.Point(340, 101);
+			this.button4.Location = new System.Drawing.Point(397, 101);
 			this.button4.Name = "button4";
 			this.button4.Size = new System.Drawing.Size(35, 23);
 			this.button4.TabIndex = 30;
@@ -404,7 +391,7 @@
 			// 
 			// button5
 			// 
-			this.button5.Location = new System.Drawing.Point(381, 127);
+			this.button5.Location = new System.Drawing.Point(438, 127);
 			this.button5.Name = "button5";
 			this.button5.Size = new System.Drawing.Size(35, 23);
 			this.button5.TabIndex = 33;
@@ -413,7 +400,7 @@
 			// 
 			// button6
 			// 
-			this.button6.Location = new System.Drawing.Point(340, 127);
+			this.button6.Location = new System.Drawing.Point(397, 127);
 			this.button6.Name = "button6";
 			this.button6.Size = new System.Drawing.Size(35, 23);
 			this.button6.TabIndex = 32;
@@ -436,9 +423,9 @@
 			this.lbl_status_m1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.lbl_status_m1.Location = new System.Drawing.Point(310, 75);
 			this.lbl_status_m1.Name = "lbl_status_m1";
-			this.lbl_status_m1.Size = new System.Drawing.Size(24, 17);
+			this.lbl_status_m1.Size = new System.Drawing.Size(71, 17);
 			this.lbl_status_m1.TabIndex = 37;
-			this.lbl_status_m1.Text = "off";
+			this.lbl_status_m1.Text = "Desligado";
 			// 
 			// lbl_status_m2
 			// 
@@ -447,9 +434,9 @@
 			this.lbl_status_m2.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
 			this.lbl_status_m2.Location = new System.Drawing.Point(309, 101);
 			this.lbl_status_m2.Name = "lbl_status_m2";
-			this.lbl_status_m2.Size = new System.Drawing.Size(24, 17);
+			this.lbl_status_m2.Size = new System.Drawing.Size(71, 17);
 			this.lbl_status_m2.TabIndex = 39;
-			this.lbl_status_m2.Text = "off";
+			this.lbl_status_m2.Text = "Desligado";
 			// 
 			// label13
 			// 
@@ -467,9 +454,9 @@
 			this.lbl_status_m3.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.lbl_status_m3.Location = new System.Drawing.Point(310, 127);
 			this.lbl_status_m3.Name = "lbl_status_m3";
-			this.lbl_status_m3.Size = new System.Drawing.Size(24, 17);
+			this.lbl_status_m3.Size = new System.Drawing.Size(71, 17);
 			this.lbl_status_m3.TabIndex = 41;
-			this.lbl_status_m3.Text = "off";
+			this.lbl_status_m3.Text = "Desligado";
 			// 
 			// label15
 			// 
@@ -487,9 +474,9 @@
 			this.lbl_status_m4.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.lbl_status_m4.Location = new System.Drawing.Point(310, 153);
 			this.lbl_status_m4.Name = "lbl_status_m4";
-			this.lbl_status_m4.Size = new System.Drawing.Size(24, 17);
+			this.lbl_status_m4.Size = new System.Drawing.Size(71, 17);
 			this.lbl_status_m4.TabIndex = 43;
-			this.lbl_status_m4.Text = "off";
+			this.lbl_status_m4.Text = "Desligado";
 			// 
 			// label14
 			// 
@@ -501,11 +488,43 @@
 			this.label14.TabIndex = 42;
 			this.label14.Text = "Status:";
 			// 
+			// tb_cur_tem
+			// 
+			this.tb_cur_tem.Location = new System.Drawing.Point(398, 180);
+			this.tb_cur_tem.Name = "tb_cur_tem";
+			this.tb_cur_tem.ReadOnly = true;
+			this.tb_cur_tem.Size = new System.Drawing.Size(54, 20);
+			this.tb_cur_tem.TabIndex = 46;
+			this.tb_cur_tem.Text = "???";
+			// 
+			// label12
+			// 
+			this.label12.AutoSize = true;
+			this.label12.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.label12.Location = new System.Drawing.Point(458, 180);
+			this.label12.Name = "label12";
+			this.label12.Size = new System.Drawing.Size(23, 17);
+			this.label12.TabIndex = 45;
+			this.label12.Text = "°C";
+			// 
+			// label16
+			// 
+			this.label16.AutoSize = true;
+			this.label16.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.label16.Location = new System.Drawing.Point(263, 180);
+			this.label16.Name = "label16";
+			this.label16.Size = new System.Drawing.Size(129, 17);
+			this.label16.TabIndex = 44;
+			this.label16.Text = "Temperatura atual:";
+			// 
 			// Form1
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(627, 352);
+			this.Controls.Add(this.tb_cur_tem);
+			this.Controls.Add(this.label12);
+			this.Controls.Add(this.label16);
 			this.Controls.Add(this.lbl_status_m4);
 			this.Controls.Add(this.label14);
 			this.Controls.Add(this.lbl_status_m3);
@@ -532,7 +551,7 @@
 			this.Controls.Add(this.label4);
 			this.Controls.Add(this.nud_m1);
 			this.Controls.Add(this.label2);
-			this.Controls.Add(this.textBox1);
+			this.Controls.Add(this.tb_set_tem);
 			this.Controls.Add(this.label3);
 			this.Controls.Add(this.lbl_temp);
 			this.Controls.Add(this.lbl_dType);
@@ -564,13 +583,12 @@
 		private System.Windows.Forms.ToolStripComboBox ms_sp_port_combobox;
 		private System.Windows.Forms.ToolStripMenuItem ms_sp_conect;
 		private System.Windows.Forms.ToolStripMenuItem ms_sp_disconect;
-        private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label lbl_dType;
         private System.Windows.Forms.NumericUpDown nud_dType;
         private System.Windows.Forms.Label lbl_temp;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox tb_set_tem;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.NumericUpDown nud_m1;
         private System.Windows.Forms.Label label4;
@@ -597,6 +615,9 @@
 		private System.Windows.Forms.Label label15;
 		private System.Windows.Forms.Label lbl_status_m4;
 		private System.Windows.Forms.Label label14;
+		private System.Windows.Forms.TextBox tb_cur_tem;
+		private System.Windows.Forms.Label label12;
+		private System.Windows.Forms.Label label16;
 	}
 }
 
