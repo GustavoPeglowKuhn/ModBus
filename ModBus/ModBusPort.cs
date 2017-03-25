@@ -9,8 +9,8 @@ namespace ModBus {
 		public System.Timers.Timer t;
 		List<byte> buffer;
 		bool waitingMessage = false;
-
-		//Queue<byte> fila = new Queue<byte>();	//coloca as mensagens na fila caso esteja esperando a resposta de um servo
+		
+		Queue<Message> fila = new Queue<Message>();	//coloca as mensagens na fila caso esteja esperando a resposta de um servo
 
 		public ModBusPort() {
 			buffer=new List<byte>();
@@ -53,7 +53,14 @@ namespace ModBus {
 			waitingMessage=false;
 		}
 
-		float timeChar3_5() {
+		public void ColocarNaFila(Message message) {
+			fila.Enqueue(message);
+			if(fila.Count == 1 && waitingMessage ==false) {
+				SendMesssage();
+			}
+		}
+
+		private float timeChar3_5() {
 			float bpc;
 			if(StopBits==System.IO.Ports.StopBits.None) bpc=0;
 			else if(StopBits==System.IO.Ports.StopBits.One) bpc=1;
@@ -64,13 +71,14 @@ namespace ModBus {
 			return 3500f * bpc/BaudRate;	//em milisegundos para o timer
 		}
 
-		public void SendMesssage(Message message) {
+		private void SendMesssage() {
 			if(waitingMessage)			throw new ModBusException("Wait slave!");
+			Message message = fila.Last();
 			if(message.GetDevice()!=0)	waitingMessage=true;
 			Write(message.GetMessage().ToArray(), 0, message.GetMessage().Count);
 		}
 
-		public Message ReadMesssage() {
+		public KeyValuePair<Message, Message> ReadMesssage() {	//par pergunta/resposta
 			int i = buffer.Count();
 			if(i<4) {  //ver o tamanho da menor mensagem valida (provavelmente eh 6)
 				int d = i==0 ? -1 : buffer[0];
@@ -82,7 +90,7 @@ namespace ModBus {
 			Message res = new Message(buffer);  //can throw CrcError exception
 			buffer.Clear();
 			waitingMessage=false;
-			return res;
+			return new KeyValuePair<Message, Message>(fila.Dequeue(), res);
 		}
 	}
 
@@ -113,7 +121,6 @@ namespace ModBus {
 			this.mes_num=mes_num;
 		}
 	}
-
 	class ModBusFrameOerFlow : Exception {
 		public ModBusFrameOerFlow() {
 		}

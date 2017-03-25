@@ -49,9 +49,10 @@ namespace ModBus {
 		}
 
 		public void InterpretaMensagem() {
-			Message mes;
+			KeyValuePair<Message, Message> par; 
+			//Message mes;
 			try {
-				mes = modBusPort.ReadMesssage();
+				par= modBusPort.ReadMesssage();
 			} catch(CrcError ex) {
 				//CRC error
 				//make a log of with time and message type
@@ -63,10 +64,10 @@ namespace ModBus {
 				MessageBox.Show("O frame nao foi completo!\nVerifique a conexao com o servo", "Timeout");
 				return;
 			}
-			if(mes.GetDevice()==(byte)e_devices.kl25) {
-				switch(mes.GetMessageType()) {
-					case (byte)mesages_num.read_cois:
-						//code here;
+			if(par.Value.GetDevice()==(byte)e_devices.kl25) {
+				switch(par.Value.GetMessageType()) {
+					case (byte)mesages_num.read_cois:	//message 1
+						
 					break;
 					case (byte)Message.MessageType.broadcast:
 						//code here too;
@@ -100,12 +101,28 @@ namespace ModBus {
 				try {
 					float temp = float.Parse(tb_set_tem.Text.ToString());
 					/*send message*/
-					refreshTemperature=false;
 				} catch(Exception) {
-					MessageBox.Show("Invalid temperature");
+					MessageBox.Show("Temperatura invalida");
 				}
+				refreshTemperature=false;
 			}
 			/*Ler a temperatura do lm35, o estado dos motores (desligado, estrela, triangulo), o teclado e o display(IHM)*/
+		}
+
+		public void  Message1(byte dispositivo, int startingAddress, int nbobinas) {	//envia a mensagem 1
+			byte[] fisrt = BitConverter.GetBytes(startingAddress);
+			byte[] num = BitConverter.GetBytes(nbobinas);
+			List<byte> body = new List<byte>();
+			if(fisrt.Length==2) body.AddRange(fisrt);
+			else
+				if(fisrt.Length==1) { body.Add(0); body.AddRange(fisrt); }
+				else return;
+			if(num.Length==2) body.AddRange(num);
+			else
+				if(num.Length==1) { body.Add(0); body.AddRange(num); }
+				else return;
+			
+			//modBusPort.SendMesssage(new Message(dispositivo, 1, body));
 		}
 
 		private void ms_sp_port_combobox_DropDown(object sender, EventArgs e) {
