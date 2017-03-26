@@ -8,6 +8,10 @@ namespace ModBus {
 	public class Message {
 		public enum MessageType : byte { broadcast }
 
+		//private byte tentativasDeEnvio = 1;	//pode ser ussado pela ModBusPort em caso de erro de transmição
+		//se for utilizar isso, criar um enum com valores como BAIXA_PRIORIDADE = 1, ALTA_PRIORIDADE = 10 e outros
+		//o valor deve ser passado no construtor da mensagem
+
 		private List<byte> message;
 
 		public Message(byte device, byte mType, List<byte> body) {

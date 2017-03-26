@@ -5,59 +5,73 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace ModBus {
+	delegate void MessageReceivedEventHandler(object source, EventArgs e);
+
 	class ModBusPort : System.IO.Ports.SerialPort {
-		public System.Timers.Timer t;
-		List<byte> buffer;
-		bool waitingMessage = false;
+		public event MessageReceivedEventHandler MessageReceived;
 		
-		Queue<Message> fila = new Queue<Message>();	//coloca as mensagens na fila caso esteja esperando a resposta de um servo
+		System.Timers.Timer char3_5 = new System.Timers.Timer();
+		List<byte> buffer = new List<byte>();
+		bool waitingMessage = false;
+		Queue<Message> writeBuffer = new Queue<Message>(); //coloca as mensagens na fila caso esteja esperando a resposta de um servo
+		Queue<KeyValuePair<Message, Message>> readBuffer = new Queue<KeyValuePair<Message, Message>>();  //coloca as mensagens na fila até o usuario ler
 
 		public ModBusPort() {
-			buffer=new List<byte>();
-			t =new System.Timers.Timer();
-			t.Enabled=false;
-
+			char3_5.Enabled=false;
 			Parity=System.IO.Ports.Parity.None;
 			StopBits=System.IO.Ports.StopBits.One;
 
 			DataReceived+=delegate {
+				char3_5.Enabled=false;
 				byte[] smallBuffer = new byte[BytesToRead];
 				Read(smallBuffer, 0, BytesToRead);
 				buffer.AddRange(smallBuffer);
 				if(buffer.Count()>255) {
 					buffer.Clear();
 					DiscardInBuffer();
-					throw new ModBusFrameOerFlow("more than 256 byte per frame");
+					return;
+					//throw new ModBusFrameOverFlow("more than 256 byte per frame");	//vai retornar para quem?????
 				}
 				//buffer.Add((byte)ReadByte());
-				t.Enabled=false;				//search a way to clear timer count//
-				t.Enabled=true;
+								
+				char3_5.Enabled=true; //search a beter way to clear the timer count//
 			};
 
-			t.Elapsed+=delegate {
-				t.Enabled=false;
-				waitingMessage=false;
+			char3_5.Elapsed+=delegate {	//after 3.5 char
+				char3_5.Enabled=false;
+				//waitingMessage=false;		//muda dentro do metodo ReadMessage(), somente apos ler o conteudo do bufer e descartar o mesmo
+				ReadMesssage();
 			};
 		}
+
+		/*protected virtual void OnMessageReceived(EventArgs e) {
+			MessageReceived?.Invoke(this, e);	//just past this line to call
+		}*/
 
 		public new void Open() {
-			t.Interval=timeChar3_5();
-			base.Open();
-			DiscardInBuffer();
-		}
+				char3_5.Interval=timeChar3_5();
+				base.Open();
+				DiscardInBuffer();
+			}
 
 		public new void Close() {
-			t.Enabled=false;
-			base.Close();		//"basse" keyword to call parent method Close
+			char3_5.Enabled=false;
+			base.Close();		//"base" keyword to call parent method Close
 			buffer.Clear();
 			waitingMessage=false;
 		}
 
-		public void ColocarNaFila(Message message) {
-			fila.Enqueue(message);
-			if(fila.Count == 1 && waitingMessage ==false) {
-				SendMesssage();
+		public void EscreverMensagem(Message message) {
+			writeBuffer.Enqueue(message);
+			if(writeBuffer.Count == 1 && waitingMessage ==false) {
+				try { SendMesssage(); } catch(ModBusException) { }
 			}
+		}
+
+		public KeyValuePair<Message, Message> LerMensagem() {
+			if(readBuffer.Count()==0)
+				throw new ModBusException("nothing to read");
+			return readBuffer.Dequeue();
 		}
 
 		private float timeChar3_5() {
@@ -66,31 +80,34 @@ namespace ModBus {
 			else if(StopBits==System.IO.Ports.StopBits.One) bpc=1;
 			else if(StopBits==System.IO.Ports.StopBits.Two) bpc=2;
 			else bpc=1.5f;
-			if(Parity!=System.IO.Ports.Parity.None) bpc+=1;
+			if(Parity!=System.IO.Ports.Parity.None) bpc+=1;		//talvez de erro! verificar se None significa sem bit de paridade ou sem testar o bit de paridade
 			bpc+=9;		//8 bits + start_bit
 			return 3500f * bpc/BaudRate;	//em milisegundos para o timer
 		}
 
 		private void SendMesssage() {
-			if(waitingMessage)			throw new ModBusException("Wait slave!");
-			Message message = fila.Last();
+			//if(waitingMessage)			throw new ModBusException("busy");
+			if(waitingMessage) return;	//ModBusPort is busy now
+			Message message = writeBuffer.Last();
 			if(message.GetDevice()!=0)	waitingMessage=true;
 			Write(message.GetMessage().ToArray(), 0, message.GetMessage().Count);
 		}
 
-		public KeyValuePair<Message, Message> ReadMesssage() {	//par pergunta/resposta
+		private void ReadMesssage() {	//par pergunta/resposta
 			int i = buffer.Count();
-			if(i<4) {  //ver o tamanho da menor mensagem valida (provavelmente eh 6)
-				int d = i==0 ? -1 : buffer[0];
-				int m = i<2 ? -1 : buffer[1];
-				DiscardInBuffer();
-				buffer.Clear();		//se a mensagem é invalida todo conteudo do buffer deve ser descartado!
-				throw new ModBusReceiveTimeOut("Incomplete message", d, m);
+			if(i>4) {  //ver o tamanho da menor mensagem valida (provavelmente eh 6)
+				try {
+					//Message res = ;  //can throw CrcError exception
+					readBuffer.Enqueue(new KeyValuePair<Message, Message>(writeBuffer.Dequeue(), new Message(buffer)));
+					//OnMessageReceived(new EventArgs());
+					MessageReceived?.Invoke(this, new EventArgs());		//caso chege nesta linha o CRC está certo	// lembrando que o Codigo do CRC ainda nao esta certo
+				} catch(CrcError) { }	//pode ser jogada uma excecao pelo "Message(byte[])"
 			}
-			Message res = new Message(buffer);  //can throw CrcError exception
 			buffer.Clear();
 			waitingMessage=false;
-			return new KeyValuePair<Message, Message>(fila.Dequeue(), res);
+			//talvez tornar o SendMesssage assincrono e chamalo antes de disparar o evento, ou nao
+			if(writeBuffer.Count > 0)	//se tiver mensagem para ser enviada ja envia
+				SendMesssage();
 		}
 	}
 
@@ -121,14 +138,14 @@ namespace ModBus {
 			this.mes_num=mes_num;
 		}
 	}
-	class ModBusFrameOerFlow : Exception {
-		public ModBusFrameOerFlow() {
+	class ModBusFrameOverFlow : Exception {
+		public ModBusFrameOverFlow() {
 		}
 
-		public ModBusFrameOerFlow(string message) : base(message){
+		public ModBusFrameOverFlow(string message) : base(message){
 		}
 
-		public ModBusFrameOerFlow(string message, Exception inner) : base(message, inner){
+		public ModBusFrameOverFlow(string message, Exception inner) : base(message, inner){
 		}
 	}
 }

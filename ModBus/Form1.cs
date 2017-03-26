@@ -15,9 +15,12 @@ namespace ModBus {
 
 		//Motor[] motors = new Motor[3];		// o quarto motor é controlado pelo kit (assim espero)
 		//a classe Motor foi pensada para o supervisorio fica rmonitorando o motor e trocar de estrela para triangulo
-
-		static string[] devices = { "broadcast", "kl25" };
+		
 		enum e_devices : byte { broadcast, kl25 };
+		static string[] devices = { "broadcast", "kl25" };
+
+		enum e_motorState : byte { desligado, estrela, triangulo };
+		byte[] motorState = { (byte)e_motorState.desligado, (byte)e_motorState.desligado, (byte)e_motorState.desligado, (byte)e_motorState.desligado };
 
 		enum mesages_num : byte { broadcast, set_coins, read_cois };	//search the real values
 
@@ -43,27 +46,14 @@ namespace ModBus {
 			nud_m4.ValueChanged+=delegate { refreshMotorTime[3]=true; };
 			tb_set_tem.TextChanged+=delegate { refreshTemperature=true; };
 
-			modBusPort.t.Elapsed+=delegate { InterpretaMensagem(); };
+			modBusPort.MessageReceived+=delegate { InterpretaMensagem(); }; //modBusPort.t.Elapsed+=delegate { InterpretaMensagem(); };
 			refreshTimer.Elapsed+=delegate { RefreshRegisters(); };
-			refreshTimer.Interval=500; //500ms planejar esse tempo depois
+			refreshTimer.Interval=2500; //2,5s planejar esse tempo depois
 		}
 
 		public void InterpretaMensagem() {
-			KeyValuePair<Message, Message> par; 
-			//Message mes;
-			try {
-				par= modBusPort.ReadMesssage();
-			} catch(CrcError ex) {
-				//CRC error
-				//make a log of with time and message type
-                MessageBox.Show("Diferente!", "Erro de CRC");
-				return;
-			} catch(ModBusReceiveTimeOut ex) {
-				//message time out error
-				//make a log of with time and message type
-				MessageBox.Show("O frame nao foi completo!\nVerifique a conexao com o servo", "Timeout");
-				return;
-			}
+			KeyValuePair<Message, Message> par;
+			par=modBusPort.LerMensagem();
 			if(par.Value.GetDevice()==(byte)e_devices.kl25) {
 				switch(par.Value.GetMessageType()) {
 					case (byte)mesages_num.read_cois:	//message 1
@@ -109,20 +99,27 @@ namespace ModBus {
 			/*Ler a temperatura do lm35, o estado dos motores (desligado, estrela, triangulo), o teclado e o display(IHM)*/
 		}
 
-		public void  Message1(byte dispositivo, int startingAddress, int nbobinas) {	//envia a mensagem 1
+		public void  Message1(byte dispositivo, ushort startingAddress, ushort nbobinas) {    //envia a mensagem 1
+			if(nbobinas>2000) return;   //limite do protocolo
+
+			//<metodo 1>
 			byte[] fisrt = BitConverter.GetBytes(startingAddress);
 			byte[] num = BitConverter.GetBytes(nbobinas);
-			List<byte> body = new List<byte>();
-			if(fisrt.Length==2) body.AddRange(fisrt);
-			else
-				if(fisrt.Length==1) { body.Add(0); body.AddRange(fisrt); }
-				else return;
-			if(num.Length==2) body.AddRange(num);
-			else
-				if(num.Length==1) { body.Add(0); body.AddRange(num); }
-				else return;
-			
-			//modBusPort.SendMesssage(new Message(dispositivo, 1, body));
+			byte[] body = new byte[4];
+			body[0]=fisrt[1];
+			body[1]=fisrt[0];
+			body[2]=num[1];
+			body[3]=num[0];
+			//</metodo 1>
+
+			//<metodo 2>
+			/*List<byte> b = new List<byte>();		//outra maneira
+			b.AddRange(BitConverter.GetBytes(startingAddress));
+			b.AddRange(BitConverter.GetBytes(nbobinas));
+			b.Reverse();*/
+			//</metodo 2>
+
+			modBusPort.EscreverMensagem(new Message(dispositivo, 1, body));
 		}
 
 		private void ms_sp_port_combobox_DropDown(object sender, EventArgs e) {
