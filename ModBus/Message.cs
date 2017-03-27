@@ -41,7 +41,7 @@ namespace ModBus {
 		public Message(List<byte> all) {
 			//message = all;			//assim funciona como ponteiro (c++ é muito mais facil de er quando é ponteiro e quando nao é :/)
 			message=new List<byte>();
-			message.AddRange(all);		//
+			message.AddRange(all);
 			if(!CheckCrc())
 				throw new CrcError("CRC diferente");
 		}
@@ -66,5 +66,156 @@ namespace ModBus {
 		public List<byte> GetMessage() {
 			return message;
 		}
+		
+		/*Message 1 - Read n coils from slave*/
+		static public Message ReadNCoils(byte dispositivo, ushort startingAddress, ushort nCoils) {
+			if(nCoils>2000) throw new BadMessage("More than 2000 Coins");   //limite do protocolo
+
+			//<metodo 1>
+			byte[] fisrt = BitConverter.GetBytes(startingAddress);
+			byte[] num = BitConverter.GetBytes(nCoils);
+			byte[] body = new byte[4];
+			body[0]=fisrt[1];   //startingAddress HI
+			body[1]=fisrt[0];	//startingAddress LO
+			body[2]=num[1];     //nCoils		  HI
+			body[3]=num[0];     //nCoils		  LO
+			//</metodo 1>
+
+			//<metodo 2>
+			/*List<byte> b = new List<byte>();		//outra maneira
+			b.AddRange(BitConverter.GetBytes(nbobinas));
+			b.AddRange(BitConverter.GetBytes(startingAddress));
+			b.Reverse();*/
+			//</metodo 2>
+
+			return new Message(dispositivo, 1, body);
+		}
+
+		/*Message 2 - Read n inputs from slave*/
+		static public Message ReadNInputs(byte dispositivo, ushort startingAddress, ushort nInputs) {    //envia a mensagem 1
+			if(nInputs>2000) throw new BadMessage("More than 2000 Inputs"); ;   //limite do protocolo
+
+			byte[] fisrt = BitConverter.GetBytes(startingAddress);
+			byte[] num = BitConverter.GetBytes(nInputs);
+			byte[] body = new byte[4];
+			body[0]=fisrt[1];	//startingAddress HI
+			body[1]=fisrt[0];	//startingAddress LO
+			body[2]=num[1];     //nInputs		  HI
+			body[3]=num[0];     //nInputs		  LO
+
+			return new Message(dispositivo, 2, body);
+		}
+
+		/*Message 3 - Read n Holding Registers from slave*/
+		static public Message ReadNHoldingRegisters(byte dispositivo, ushort startingAddress, ushort nRegisters) {    //envia a mensagem 1
+			if(nRegisters>125) throw new BadMessage("More than 125 Registers");   //limite do protocolo, exede o tamanho do frame
+
+			byte[] fisrt = BitConverter.GetBytes(startingAddress);
+			byte[] num = BitConverter.GetBytes(nRegisters);
+			byte[] body = new byte[4];
+			body[0]=fisrt[1];   //startingAddress HI
+			body[1]=fisrt[0];   //startingAddress LO
+			body[2]=0;			//ever 0
+			body[3]=num[0];     //nRegisters	  LO
+
+			return new Message(dispositivo, 3, body);
+		}
+
+		/*Message 5 - Write a single coils*/
+		static public Message WriteSigleCoil(byte dispositivo, ushort CoilAddress, bool coilValue) {
+			byte[] fisrt = BitConverter.GetBytes(CoilAddress);
+			byte[] body = new byte[4];
+			body[0]=fisrt[1];   //CoilAddress	HI
+			body[1]=fisrt[0];   //CoilAddress	LO
+			body[2]=(byte)(coilValue?256:0);	//value
+			body[3]=0;							//ever 0
+			return new Message(dispositivo, 5, body);
+		}
+
+		/*Message 6 - Write a single coils*/
+		static public Message WriteSigleHoldingRegisters(byte dispositivo, ushort registerAddress, bool registerValue) {
+			byte[] fisrt = BitConverter.GetBytes(registerAddress);
+			byte[] value = BitConverter.GetBytes(registerValue);
+			byte[] body = new byte[4];
+			body[0]=fisrt[1];   //CoilAddress	HI
+			body[1]=fisrt[0];   //CoilAddress	LO
+			body[2]=value[1];   //registerValue HI
+			body[3]=value[0];   //registerValue LO
+			return new Message(dispositivo, 6, body);
+		}
+
+		/*Message 15 - Write n coils*/ //o numero de bobinas é o tamanho da lista values
+		static public Message WriteNCoils(byte dispositivo, ushort startingAddress, List<bool> values) {
+			ushort nCoils = (ushort)values.Count;
+			if(nCoils>2000) throw new BadMessage("More than 2000 Inputs"); ;   //limite do protocolo
+			
+			byte N = (byte)(nCoils/8);
+			if(nCoils%8!=0) N++;
+
+			byte[] fisrt = BitConverter.GetBytes(startingAddress);
+			byte[] num = BitConverter.GetBytes(nCoils);
+			byte[] body = new byte[5 + N];
+			body[0]=fisrt[1];
+			body[1]=fisrt[0];
+			body[2]=num[1];
+			body[3]=num[0];
+			body[4]=N;
+
+			for(byte i = 0; i<N; i++) {
+				int j = i*8;
+				int aux = 0;
+				for(int k=0; k<8 && j+k <nCoils; k++) {
+					if(values[j+k]) aux+=2^k;
+				}
+				body[5+i]=(byte)aux;
+			}
+
+			return new Message(dispositivo, 2, body);
+		}
+
+		/*Message 16 - Write n coils*/ //o numero de Holding Registers é o tamanho da lista values
+		static public Message WriteNHoldingRegisters(byte dispositivo, ushort startingAddress, List<ushort> values) {
+			ushort nRegisters = (ushort)values.Count;
+			if(nRegisters>120) throw new BadMessage("More than 120 Registers"); ;   //limite do protocolo
+
+			byte[] fisrt = BitConverter.GetBytes(startingAddress);
+			byte[] num = BitConverter.GetBytes(nRegisters);
+			byte[] body = new byte[5+2*nRegisters];
+			body[0]=fisrt[1];
+			body[1]=fisrt[0];
+			body[2]=num[1];
+			body[3]=num[0];
+			body[4]=(byte)nRegisters;
+
+			for(int i=0; i<nRegisters; i++) {
+				byte[] aux = BitConverter.GetBytes(values[i]);
+				body[5+2*i]=aux[1];		//iezimo valor HI
+				body[6+2*i]=aux[0];     //iezimo valor LO
+			}
+
+			return new Message(dispositivo, 16, body);
+		}
+	}
+	class BadMessage : Exception {
+		public BadMessage() {
+		}
+
+		public BadMessage(string message) : base(message) {
+		}
+
+		public BadMessage(string message, Exception inner) : base(message, inner) {
+		}
 	}
 }
+
+/*	| Mensagens	|   estado	 |
+	| 1			| testar	 |
+	| 2			| testar	 |
+	| 3			| testar	 |
+	| 4			| nao usada	 |
+	| 5			| testar	 |
+	| 6			| testar	 |
+	| 7 - 14	| nao usada	 |
+	| 15		| testar	 |
+	| 16		| testar	 |
+*/

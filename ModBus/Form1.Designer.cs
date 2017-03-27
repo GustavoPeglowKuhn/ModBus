@@ -66,6 +66,10 @@
 			this.tb_cur_tem = new System.Windows.Forms.TextBox();
 			this.label12 = new System.Windows.Forms.Label();
 			this.label16 = new System.Windows.Forms.Label();
+			this.parityToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.toolStripComboBox1 = new System.Windows.Forms.ToolStripComboBox();
+			this.stopBitsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.toolStripComboBox2 = new System.Windows.Forms.ToolStripComboBox();
 			this.menuStrip1.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.nud_dType)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.nud_m1)).BeginInit();
@@ -89,6 +93,8 @@
 			this.ms_SerialPort.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.ms_sp_port,
             this.ms_sp_baud,
+            this.parityToolStripMenuItem,
+            this.stopBitsToolStripMenuItem,
             this.ms_sp_conect,
             this.ms_sp_disconect});
 			this.ms_SerialPort.Name = "ms_SerialPort";
@@ -100,7 +106,7 @@
 			this.ms_sp_port.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.ms_sp_port_combobox});
 			this.ms_sp_port.Name = "ms_sp_port";
-			this.ms_sp_port.Size = new System.Drawing.Size(126, 22);
+			this.ms_sp_port.Size = new System.Drawing.Size(152, 22);
 			this.ms_sp_port.Text = "Port";
 			// 
 			// ms_sp_port_combobox
@@ -115,7 +121,7 @@
 			this.ms_sp_baud.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.ms_sp_baud_combobox});
 			this.ms_sp_baud.Name = "ms_sp_baud";
-			this.ms_sp_baud.Size = new System.Drawing.Size(126, 22);
+			this.ms_sp_baud.Size = new System.Drawing.Size(152, 22);
 			this.ms_sp_baud.Text = "BaudRate";
 			// 
 			// ms_sp_baud_combobox
@@ -127,7 +133,7 @@
 			// ms_sp_conect
 			// 
 			this.ms_sp_conect.Name = "ms_sp_conect";
-			this.ms_sp_conect.Size = new System.Drawing.Size(126, 22);
+			this.ms_sp_conect.Size = new System.Drawing.Size(152, 22);
 			this.ms_sp_conect.Text = "Conect";
 			this.ms_sp_conect.Click += new System.EventHandler(this.ms_sp_conect_Click);
 			// 
@@ -135,7 +141,7 @@
 			// 
 			this.ms_sp_disconect.Enabled = false;
 			this.ms_sp_disconect.Name = "ms_sp_disconect";
-			this.ms_sp_disconect.Size = new System.Drawing.Size(126, 22);
+			this.ms_sp_disconect.Size = new System.Drawing.Size(152, 22);
 			this.ms_sp_disconect.Text = "Disconect";
 			this.ms_sp_disconect.Click += new System.EventHandler(this.ms_sp_disconect_Click);
 			// 
@@ -517,6 +523,32 @@
 			this.label16.TabIndex = 44;
 			this.label16.Text = "Temperatura atual:";
 			// 
+			// parityToolStripMenuItem
+			// 
+			this.parityToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripComboBox1});
+			this.parityToolStripMenuItem.Name = "parityToolStripMenuItem";
+			this.parityToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+			this.parityToolStripMenuItem.Text = "Parity";
+			// 
+			// toolStripComboBox1
+			// 
+			this.toolStripComboBox1.Name = "toolStripComboBox1";
+			this.toolStripComboBox1.Size = new System.Drawing.Size(121, 23);
+			// 
+			// stopBitsToolStripMenuItem
+			// 
+			this.stopBitsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripComboBox2});
+			this.stopBitsToolStripMenuItem.Name = "stopBitsToolStripMenuItem";
+			this.stopBitsToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+			this.stopBitsToolStripMenuItem.Text = "StopBits";
+			// 
+			// toolStripComboBox2
+			// 
+			this.toolStripComboBox2.Name = "toolStripComboBox2";
+			this.toolStripComboBox2.Size = new System.Drawing.Size(121, 23);
+			// 
 			// Form1
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -618,6 +650,10 @@
 		private System.Windows.Forms.TextBox tb_cur_tem;
 		private System.Windows.Forms.Label label12;
 		private System.Windows.Forms.Label label16;
+		private System.Windows.Forms.ToolStripMenuItem parityToolStripMenuItem;
+		private System.Windows.Forms.ToolStripComboBox toolStripComboBox1;
+		private System.Windows.Forms.ToolStripMenuItem stopBitsToolStripMenuItem;
+		private System.Windows.Forms.ToolStripComboBox toolStripComboBox2;
 	}
 }
 

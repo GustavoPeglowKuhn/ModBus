@@ -99,29 +99,6 @@ namespace ModBus {
 			/*Ler a temperatura do lm35, o estado dos motores (desligado, estrela, triangulo), o teclado e o display(IHM)*/
 		}
 
-		public void  Message1(byte dispositivo, ushort startingAddress, ushort nbobinas) {    //envia a mensagem 1
-			if(nbobinas>2000) return;   //limite do protocolo
-
-			//<metodo 1>
-			byte[] fisrt = BitConverter.GetBytes(startingAddress);
-			byte[] num = BitConverter.GetBytes(nbobinas);
-			byte[] body = new byte[4];
-			body[0]=fisrt[1];
-			body[1]=fisrt[0];
-			body[2]=num[1];
-			body[3]=num[0];
-			//</metodo 1>
-
-			//<metodo 2>
-			/*List<byte> b = new List<byte>();		//outra maneira
-			b.AddRange(BitConverter.GetBytes(startingAddress));
-			b.AddRange(BitConverter.GetBytes(nbobinas));
-			b.Reverse();*/
-			//</metodo 2>
-
-			modBusPort.EscreverMensagem(new Message(dispositivo, 1, body));
-		}
-
 		private void ms_sp_port_combobox_DropDown(object sender, EventArgs e) {
 			/*	Essa funcao e chamada toda ves que o usuario verifica as portas seriais disponiveis		*/
 			ms_sp_port_combobox.Items.Clear();
