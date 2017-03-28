@@ -29,7 +29,7 @@ namespace ModBus {
 		//static string[] sBaudRate = { "9600", "14400", "19200", "38400", "57600", "115200", "128000", "256000" };
 
 
-		bool[] refreshMotorTime = {true, true, true, true };
+		bool[] refreshMotorTime = {true, true, true, true};
 		bool refreshTemperature = true;
 
 		public Form1() {
@@ -46,12 +46,15 @@ namespace ModBus {
 			nud_m4.ValueChanged+=delegate { refreshMotorTime[3]=true; };
 			tb_set_tem.TextChanged+=delegate { refreshTemperature=true; };
 
-			modBusPort.MessageReceived+=delegate { InterpretaMensagem(); }; //modBusPort.t.Elapsed+=delegate { InterpretaMensagem(); };
+			//modBusPort.MessageReceived+=delegate { InterpretaMensagem(); }; //modBusPort.t.Elapsed+=delegate { InterpretaMensagem(); };
 			refreshTimer.Elapsed+=delegate { RefreshRegisters(); };
 			refreshTimer.Interval=2500; //2,5s planejar esse tempo depois
+
+			modBusPort.MessageReceived+=InterpretaMensagem;
+			//modBusPort.MessageTimeOut+=InterpretaMensagemSemResposta;
 		}
 
-		public void InterpretaMensagem() {
+		/*public void InterpretaMensagem() {
 			KeyValuePair<Message, Message> par;
 			par=modBusPort.LerMensagem();
 			if(par.Value.GetDevice()==(byte)e_devices.kl25) {
@@ -61,6 +64,21 @@ namespace ModBus {
 					break;
 					case (byte)Message.MessageType.broadcast:
 						//code here too;
+					break;
+				}
+			}
+		}*/
+
+		private void InterpretaMensagem(object sender, MesssageReceivedEventArgs e) {
+			KeyValuePair<Message, Message> par;
+			par=e.MessagePair;
+			if(par.Value.GetDevice()==(byte)e_devices.kl25) {
+				switch(par.Value.GetMessageType()) {
+					case (byte)mesages_num.read_cois:   //message 1
+
+					break;
+					case (byte)Message.MessageType.broadcast:
+					//code here too;
 					break;
 				}
 			}
