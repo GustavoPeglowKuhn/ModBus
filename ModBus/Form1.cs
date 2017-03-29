@@ -51,7 +51,7 @@ namespace ModBus {
 			refreshTimer.Interval=2500; //2,5s planejar esse tempo depois
 
 			modBusPort.MessageReceived+=InterpretaMensagem;
-			//modBusPort.MessageTimeOut+=InterpretaMensagemSemResposta;
+			modBusPort.MessageTimeOut+=InterpretaMensagemSemResposta;
 		}
 
 		/*public void InterpretaMensagem() {
@@ -69,7 +69,7 @@ namespace ModBus {
 			}
 		}*/
 
-		private void InterpretaMensagem(object sender, MesssageReceivedEventArgs e) {
+		private void InterpretaMensagem(object sender, MessageReceivedEventArgs e) {
 			KeyValuePair<Message, Message> par;
 			par=e.MessagePair;
 			if(par.Value.GetDevice()==(byte)e_devices.kl25) {
@@ -82,6 +82,10 @@ namespace ModBus {
 					break;
 				}
 			}
+		}
+
+		private void InterpretaMensagemSemResposta(object sender, MessageTimeOutEventArgs e) {  //so para teste por enquanto
+			MessageBox.Show(e.SendMessage.GetMessageType().ToString(),"hello");
 		}
 
 		public void RefreshRegisters() {
@@ -193,6 +197,12 @@ namespace ModBus {
 				lbl_dType.Text = devices[(int)e_devices.kl25];
 			else
                 lbl_dType.Text = "unknow";
+		}
+
+		private void btn_test_Click(object sender, EventArgs e) {   //so para teste
+			try {
+				modBusPort.EscreverMensagem(Message.ReadNCoils(01, 00, 8));
+			} catch(Exception) { }
 		}
 	}
 }

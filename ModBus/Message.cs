@@ -28,8 +28,10 @@ namespace ModBus {
 			message.Add(device);
 			message.Add(mType);
 			message.AddRange(body);
-			byte[] crc = Crc.Calculate(message);	//Criar algoritimo do crc
-			message.AddRange(crc);
+			byte[] crc = Crc.Calculate(message);    //Criar algoritimo do crc
+//			message.AddRange(crc);
+			message.Add(crc[1]);	//CRC LO
+			message.Add(crc[0]);	//CRC HI
 		}
 
 		public Message(byte[] all) {

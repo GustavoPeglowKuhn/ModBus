@@ -29,6 +29,10 @@
 			this.ms_sp_port_combobox = new System.Windows.Forms.ToolStripComboBox();
 			this.ms_sp_baud = new System.Windows.Forms.ToolStripMenuItem();
 			this.ms_sp_baud_combobox = new System.Windows.Forms.ToolStripComboBox();
+			this.parityToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.toolStripComboBox1 = new System.Windows.Forms.ToolStripComboBox();
+			this.stopBitsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.toolStripComboBox2 = new System.Windows.Forms.ToolStripComboBox();
 			this.ms_sp_conect = new System.Windows.Forms.ToolStripMenuItem();
 			this.ms_sp_disconect = new System.Windows.Forms.ToolStripMenuItem();
 			this.label1 = new System.Windows.Forms.Label();
@@ -66,10 +70,7 @@
 			this.tb_cur_tem = new System.Windows.Forms.TextBox();
 			this.label12 = new System.Windows.Forms.Label();
 			this.label16 = new System.Windows.Forms.Label();
-			this.parityToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.toolStripComboBox1 = new System.Windows.Forms.ToolStripComboBox();
-			this.stopBitsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.toolStripComboBox2 = new System.Windows.Forms.ToolStripComboBox();
+			this.btn_test = new System.Windows.Forms.Button();
 			this.menuStrip1.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.nud_dType)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.nud_m1)).BeginInit();
@@ -106,7 +107,7 @@
 			this.ms_sp_port.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.ms_sp_port_combobox});
 			this.ms_sp_port.Name = "ms_sp_port";
-			this.ms_sp_port.Size = new System.Drawing.Size(152, 22);
+			this.ms_sp_port.Size = new System.Drawing.Size(126, 22);
 			this.ms_sp_port.Text = "Port";
 			// 
 			// ms_sp_port_combobox
@@ -121,7 +122,7 @@
 			this.ms_sp_baud.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.ms_sp_baud_combobox});
 			this.ms_sp_baud.Name = "ms_sp_baud";
-			this.ms_sp_baud.Size = new System.Drawing.Size(152, 22);
+			this.ms_sp_baud.Size = new System.Drawing.Size(126, 22);
 			this.ms_sp_baud.Text = "BaudRate";
 			// 
 			// ms_sp_baud_combobox
@@ -130,10 +131,36 @@
 			this.ms_sp_baud_combobox.Size = new System.Drawing.Size(121, 23);
 			this.ms_sp_baud_combobox.SelectedIndexChanged += new System.EventHandler(this.ms_sp_baud_combobox_SelectedIndexChanged);
 			// 
+			// parityToolStripMenuItem
+			// 
+			this.parityToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripComboBox1});
+			this.parityToolStripMenuItem.Name = "parityToolStripMenuItem";
+			this.parityToolStripMenuItem.Size = new System.Drawing.Size(126, 22);
+			this.parityToolStripMenuItem.Text = "Parity";
+			// 
+			// toolStripComboBox1
+			// 
+			this.toolStripComboBox1.Name = "toolStripComboBox1";
+			this.toolStripComboBox1.Size = new System.Drawing.Size(121, 23);
+			// 
+			// stopBitsToolStripMenuItem
+			// 
+			this.stopBitsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripComboBox2});
+			this.stopBitsToolStripMenuItem.Name = "stopBitsToolStripMenuItem";
+			this.stopBitsToolStripMenuItem.Size = new System.Drawing.Size(126, 22);
+			this.stopBitsToolStripMenuItem.Text = "StopBits";
+			// 
+			// toolStripComboBox2
+			// 
+			this.toolStripComboBox2.Name = "toolStripComboBox2";
+			this.toolStripComboBox2.Size = new System.Drawing.Size(121, 23);
+			// 
 			// ms_sp_conect
 			// 
 			this.ms_sp_conect.Name = "ms_sp_conect";
-			this.ms_sp_conect.Size = new System.Drawing.Size(152, 22);
+			this.ms_sp_conect.Size = new System.Drawing.Size(126, 22);
 			this.ms_sp_conect.Text = "Conect";
 			this.ms_sp_conect.Click += new System.EventHandler(this.ms_sp_conect_Click);
 			// 
@@ -141,7 +168,7 @@
 			// 
 			this.ms_sp_disconect.Enabled = false;
 			this.ms_sp_disconect.Name = "ms_sp_disconect";
-			this.ms_sp_disconect.Size = new System.Drawing.Size(152, 22);
+			this.ms_sp_disconect.Size = new System.Drawing.Size(126, 22);
 			this.ms_sp_disconect.Text = "Disconect";
 			this.ms_sp_disconect.Click += new System.EventHandler(this.ms_sp_disconect_Click);
 			// 
@@ -523,37 +550,22 @@
 			this.label16.TabIndex = 44;
 			this.label16.Text = "Temperatura atual:";
 			// 
-			// parityToolStripMenuItem
+			// btn_test
 			// 
-			this.parityToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripComboBox1});
-			this.parityToolStripMenuItem.Name = "parityToolStripMenuItem";
-			this.parityToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-			this.parityToolStripMenuItem.Text = "Parity";
-			// 
-			// toolStripComboBox1
-			// 
-			this.toolStripComboBox1.Name = "toolStripComboBox1";
-			this.toolStripComboBox1.Size = new System.Drawing.Size(121, 23);
-			// 
-			// stopBitsToolStripMenuItem
-			// 
-			this.stopBitsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripComboBox2});
-			this.stopBitsToolStripMenuItem.Name = "stopBitsToolStripMenuItem";
-			this.stopBitsToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-			this.stopBitsToolStripMenuItem.Text = "StopBits";
-			// 
-			// toolStripComboBox2
-			// 
-			this.toolStripComboBox2.Name = "toolStripComboBox2";
-			this.toolStripComboBox2.Size = new System.Drawing.Size(121, 23);
+			this.btn_test.Location = new System.Drawing.Point(33, 284);
+			this.btn_test.Name = "btn_test";
+			this.btn_test.Size = new System.Drawing.Size(195, 23);
+			this.btn_test.TabIndex = 47;
+			this.btn_test.Text = "teste";
+			this.btn_test.UseVisualStyleBackColor = true;
+			this.btn_test.Click += new System.EventHandler(this.btn_test_Click);
 			// 
 			// Form1
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(627, 352);
+			this.Controls.Add(this.btn_test);
 			this.Controls.Add(this.tb_cur_tem);
 			this.Controls.Add(this.label12);
 			this.Controls.Add(this.label16);
@@ -592,7 +604,7 @@
 			this.Controls.Add(this.menuStrip1);
 			this.MainMenuStrip = this.menuStrip1;
 			this.Name = "Form1";
-			this.Text = "ModBus - Master of Puppets";
+			this.Text = "ModBus - Master";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
 			this.menuStrip1.ResumeLayout(false);
 			this.menuStrip1.PerformLayout();
@@ -654,6 +666,7 @@
 		private System.Windows.Forms.ToolStripComboBox toolStripComboBox1;
 		private System.Windows.Forms.ToolStripMenuItem stopBitsToolStripMenuItem;
 		private System.Windows.Forms.ToolStripComboBox toolStripComboBox2;
+		private System.Windows.Forms.Button btn_test;
 	}
 }
 

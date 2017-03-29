@@ -6,17 +6,16 @@ using System.Threading.Tasks;
 
 namespace ModBus {
 	//delegate void MessageReceivedEventHandler(object source, EventArgs e);
-	delegate void MessageReceivedEventHandler(object source, MesssageReceivedEventArgs e);
-	
+	delegate void MessageReceivedEventHandler(object source, MessageReceivedEventArgs e);
 	//delegate void BadMessageReceivedEventHandler(object source, EventArgs e);
-	delegate void MessageTimeOutEventHandler(object source, MesssageTimeOutEventArgs e);
+	delegate void MessageTimeOutEventHandler(object source, MessageTimeOutEventArgs e);
 
 	class ModBusPort : System.IO.Ports.SerialPort {
 		public event MessageReceivedEventHandler MessageReceived;
 		public event MessageTimeOutEventHandler MessageTimeOut;
 
 		System.Timers.Timer tmr_3_5char = new System.Timers.Timer();
-		System.Timers.Timer tmr_TimeOut = new System.Timers.Timer();
+		System.Timers.Timer tmr_TimeOut = new System.Timers.Timer();	//use this to see if is waiting a message
 		List<byte> buffer = new List<byte>();
 		bool waitingMessage = false;
 		Queue<Message> writeBuffer = new Queue<Message>(); //coloca as mensagens na fila caso esteja esperando a resposta de um servo
@@ -58,11 +57,12 @@ namespace ModBus {
 				//TimeOutQueue.Enqueue(writeBuffer.Dequeue());
 				//if(TimeOutQueue.Count>TimeOutQueueMaxSize)	TimeOutQueue.Dequeue();
 				//MessageTimeOut?.Invoke(this, new EventArgs());
-				MessageTimeOut?.Invoke(this, new MesssageTimeOutEventArgs(writeBuffer.Dequeue()));
+				Message mes = writeBuffer.Dequeue();    //para tirar a mensagem da fila, mesmo que MessageTimeOut nao seja invocado
+				MessageTimeOut?.Invoke(this, new MessageTimeOutEventArgs(mes));
 				buffer.Clear();
 				waitingMessage=false;
-				if(writeBuffer.Count>0) //se tiver mensagem para ser enviada ja envia
-					SendMesssage();
+				//if(writeBuffer.Count>0) //se tiver mensagem para ser enviada ja envia
+				SendMesssage();
 			};
 		}
 
@@ -73,12 +73,13 @@ namespace ModBus {
 		public new void Open() {
 			float charTime = timeChar_ms();
 			tmr_3_5char.Interval=charTime*3.5;	//3,5 caracteres, conforme o protocolo
-			tmr_TimeOut.Interval=charTime*100;	//planejar esse tempo depois
+			tmr_TimeOut.Interval=charTime*1000;	//planejar esse tempo depois
 			base.Open();
 			DiscardInBuffer();
 		}
 		public new void Close() {
 			tmr_3_5char.Enabled=false;
+			tmr_TimeOut.Enabled=false;
 			base.Close();		//"base" keyword to call parent method Close
 			buffer.Clear();
 			waitingMessage=false;
@@ -86,9 +87,10 @@ namespace ModBus {
 
 		public void EscreverMensagem(Message message) {
 			writeBuffer.Enqueue(message);
-			if(writeBuffer.Count == 1 && waitingMessage ==false) {
+			SendMesssage();
+			/*if(writeBuffer.Count == 1 && waitingMessage ==false) {
 				try { SendMesssage(); } catch(ModBusException) { }
-			}
+			}*/
 		}
 		/*public KeyValuePair<Message, Message> LerMensagem() {
 			if(readBuffer.Count()==0)
@@ -109,24 +111,34 @@ namespace ModBus {
 
 		private void SendMesssage() {
 			//if(waitingMessage)			throw new ModBusException("busy");
-			if(waitingMessage) return;  //ModBusPort is busy now
+			//if(waitingMessage) return;  //ModBusPort is busy now
+			if(tmr_TimeOut.Enabled) return;  //ModBusPort is busy now
 			if(writeBuffer.Count==0) return;	//Nothing to write
 			Message message = writeBuffer.Last();
-			if(message.GetDevice()!=0)	waitingMessage=true;
 			Write(message.GetMessage().ToArray(), 0, message.GetMessage().Count);
-			tmr_TimeOut.Enabled=true;
+			if(message.GetDevice()!=0) {
+				waitingMessage=true;
+				tmr_TimeOut.Enabled=true;
+			}
 		}
 
-		private void ReadMesssage() {	//par pergunta/resposta
+		private void ReadMesssage() {   //par pergunta/resposta
 			int i = buffer.Count();
 			if(i>4) {  //ver o tamanho da menor mensagem valida (provavelmente eh 6)
+				Message mes = null;
 				try {
-					KeyValuePair<Message, Message> messagePair = new KeyValuePair<Message, Message>(writeBuffer.Dequeue(), new Message(buffer));
-					MessageReceived?.Invoke(this, new MesssageReceivedEventArgs(messagePair));
+					mes=writeBuffer.Dequeue();
+					KeyValuePair<Message, Message> messagePair = new KeyValuePair<Message, Message>(mes, new Message(buffer));
+					MessageReceived?.Invoke(this, new MessageReceivedEventArgs(messagePair));
 				} catch(CrcError) {//pode ser jogada uma excecao pelo "Message(byte[])"
 					//BadMessagesQueue.Enqueue();
 					//BadMessageReceived?.Invoke(this, new EventArgs());
-				}   
+				}
+			}else {
+				writeBuffer.Dequeue();	//remove a mensagem que foi respondida corretamente
+										//pode ser colocado um flag na classe message para indicar se ela deve ser enviada novemente para o servo
+
+				//pode ser disparado um evento para indicar o erro
 			}
 			buffer.Clear();
 			DiscardInBuffer();
@@ -175,17 +187,17 @@ namespace ModBus {
 		}
 	}
 
-	class MesssageTimeOutEventArgs : EventArgs {
+	class MessageTimeOutEventArgs : EventArgs {
 		public Message SendMessage { get; }
 
-		public MesssageTimeOutEventArgs(Message message) {
+		public MessageTimeOutEventArgs(Message message) {
 			SendMessage=message;
 		}
 	}
-	class MesssageReceivedEventArgs : EventArgs {
+	class MessageReceivedEventArgs : EventArgs {
 		public KeyValuePair<Message, Message> MessagePair { get; }
 
-		public MesssageReceivedEventArgs(KeyValuePair<Message, Message> messagePair) {
+		public MessageReceivedEventArgs(KeyValuePair<Message, Message> messagePair) {
 			this.MessagePair=messagePair;
 		}
 	}
