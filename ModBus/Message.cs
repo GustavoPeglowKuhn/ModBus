@@ -6,8 +6,6 @@ using System.Threading.Tasks;
 
 namespace ModBus {
 	public class Message {
-		public enum MessageType : byte { broadcast }
-
 		//private byte tentativasDeEnvio = 1;	//pode ser ussado pela ModBusPort em caso de erro de transmição
 		//se for utilizar isso, criar um enum com valores como BAIXA_PRIORIDADE = 1, ALTA_PRIORIDADE = 10 e outros
 		//o valor deve ser passado no construtor da mensagem
@@ -68,7 +66,7 @@ namespace ModBus {
 		public List<byte> GetMessage() {
 			return message;
 		}
-		
+
 		/*Message 1 - Read n coils from slave*/
 		static public Message ReadNCoils(byte dispositivo, ushort startingAddress, ushort nCoils) {
 			if(nCoils>2000) throw new BadMessage("More than 2000 Coins");   //limite do protocolo
@@ -90,7 +88,7 @@ namespace ModBus {
 			b.Reverse();*/
 			//</metodo 2>
 
-			return new Message(dispositivo, 1, body);
+			return new Message(dispositivo, (byte)MessageType.ReadNCoils, body);
 		}
 
 		/*Message 2 - Read n inputs from slave*/
@@ -105,7 +103,7 @@ namespace ModBus {
 			body[2]=num[1];     //nInputs		  HI
 			body[3]=num[0];     //nInputs		  LO
 
-			return new Message(dispositivo, 2, body);
+			return new Message(dispositivo, (byte)MessageType.ReadNInputs, body);
 		}
 
 		/*Message 3 - Read n Holding Registers from slave*/
@@ -120,7 +118,7 @@ namespace ModBus {
 			body[2]=0;			//ever 0
 			body[3]=num[0];     //nRegisters	  LO
 
-			return new Message(dispositivo, 3, body);
+			return new Message(dispositivo, (byte)MessageType.ReadNHoldingRegisters, body);
 		}
 
 		/*Message 5 - Write a single coils*/
@@ -131,10 +129,10 @@ namespace ModBus {
 			body[1]=fisrt[0];   //CoilAddress	LO
 			body[2]=(byte)(coilValue?256:0);	//value
 			body[3]=0;							//ever 0
-			return new Message(dispositivo, 5, body);
+			return new Message(dispositivo, (byte)MessageType.WriteSigleCoil, body);
 		}
 
-		/*Message 6 - Write a single coils*/
+		/*Message 6 - Write a single Holding Registers*/
 		static public Message WriteSigleHoldingRegisters(byte dispositivo, ushort registerAddress, bool registerValue) {
 			byte[] fisrt = BitConverter.GetBytes(registerAddress);
 			byte[] value = BitConverter.GetBytes(registerValue);
@@ -143,7 +141,7 @@ namespace ModBus {
 			body[1]=fisrt[0];   //CoilAddress	LO
 			body[2]=value[1];   //registerValue HI
 			body[3]=value[0];   //registerValue LO
-			return new Message(dispositivo, 6, body);
+			return new Message(dispositivo, (byte)MessageType.WriteSigleHoldingRegisters, body);
 		}
 
 		/*Message 15 - Write n coils*/ //o numero de bobinas é o tamanho da lista values
@@ -172,7 +170,7 @@ namespace ModBus {
 				body[5+i]=(byte)aux;
 			}
 
-			return new Message(dispositivo, 2, body);
+			return new Message(dispositivo, (byte)MessageType.WriteNCoils, body);
 		}
 
 		/*Message 16 - Write n coils*/ //o numero de Holding Registers é o tamanho da lista values
@@ -195,7 +193,7 @@ namespace ModBus {
 				body[6+2*i]=aux[0];     //iezimo valor LO
 			}
 
-			return new Message(dispositivo, 16, body);
+			return new Message(dispositivo, (byte)MessageType.WriteNHoldingRegisters, body);
 		}
 	}
 	class BadMessage : Exception {

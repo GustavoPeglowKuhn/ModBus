@@ -29,10 +29,10 @@
 			this.ms_sp_port_combobox = new System.Windows.Forms.ToolStripComboBox();
 			this.ms_sp_baud = new System.Windows.Forms.ToolStripMenuItem();
 			this.ms_sp_baud_combobox = new System.Windows.Forms.ToolStripComboBox();
-			this.parityToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.toolStripComboBox1 = new System.Windows.Forms.ToolStripComboBox();
-			this.stopBitsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.toolStripComboBox2 = new System.Windows.Forms.ToolStripComboBox();
+			this.ms_sp_parity = new System.Windows.Forms.ToolStripMenuItem();
+			this.ms_sp_par_combobox = new System.Windows.Forms.ToolStripComboBox();
+			this.ms_sp_stopBits = new System.Windows.Forms.ToolStripMenuItem();
+			this.ms_sp_stop_combobox = new System.Windows.Forms.ToolStripComboBox();
 			this.ms_sp_conect = new System.Windows.Forms.ToolStripMenuItem();
 			this.ms_sp_disconect = new System.Windows.Forms.ToolStripMenuItem();
 			this.label1 = new System.Windows.Forms.Label();
@@ -94,8 +94,8 @@
 			this.ms_SerialPort.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.ms_sp_port,
             this.ms_sp_baud,
-            this.parityToolStripMenuItem,
-            this.stopBitsToolStripMenuItem,
+            this.ms_sp_parity,
+            this.ms_sp_stopBits,
             this.ms_sp_conect,
             this.ms_sp_disconect});
 			this.ms_SerialPort.Name = "ms_SerialPort";
@@ -107,7 +107,7 @@
 			this.ms_sp_port.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.ms_sp_port_combobox});
 			this.ms_sp_port.Name = "ms_sp_port";
-			this.ms_sp_port.Size = new System.Drawing.Size(126, 22);
+			this.ms_sp_port.Size = new System.Drawing.Size(152, 22);
 			this.ms_sp_port.Text = "Port";
 			// 
 			// ms_sp_port_combobox
@@ -122,7 +122,7 @@
 			this.ms_sp_baud.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.ms_sp_baud_combobox});
 			this.ms_sp_baud.Name = "ms_sp_baud";
-			this.ms_sp_baud.Size = new System.Drawing.Size(126, 22);
+			this.ms_sp_baud.Size = new System.Drawing.Size(152, 22);
 			this.ms_sp_baud.Text = "BaudRate";
 			// 
 			// ms_sp_baud_combobox
@@ -131,36 +131,38 @@
 			this.ms_sp_baud_combobox.Size = new System.Drawing.Size(121, 23);
 			this.ms_sp_baud_combobox.SelectedIndexChanged += new System.EventHandler(this.ms_sp_baud_combobox_SelectedIndexChanged);
 			// 
-			// parityToolStripMenuItem
+			// ms_sp_parity
 			// 
-			this.parityToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripComboBox1});
-			this.parityToolStripMenuItem.Name = "parityToolStripMenuItem";
-			this.parityToolStripMenuItem.Size = new System.Drawing.Size(126, 22);
-			this.parityToolStripMenuItem.Text = "Parity";
+			this.ms_sp_parity.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.ms_sp_par_combobox});
+			this.ms_sp_parity.Name = "ms_sp_parity";
+			this.ms_sp_parity.Size = new System.Drawing.Size(152, 22);
+			this.ms_sp_parity.Text = "Parity";
 			// 
-			// toolStripComboBox1
+			// ms_sp_par_combobox
 			// 
-			this.toolStripComboBox1.Name = "toolStripComboBox1";
-			this.toolStripComboBox1.Size = new System.Drawing.Size(121, 23);
+			this.ms_sp_par_combobox.Name = "ms_sp_par_combobox";
+			this.ms_sp_par_combobox.Size = new System.Drawing.Size(121, 23);
+			this.ms_sp_par_combobox.SelectedIndexChanged += new System.EventHandler(this.ms_sp_par_combobox_SelectedIndexChanged);
 			// 
-			// stopBitsToolStripMenuItem
+			// ms_sp_stopBits
 			// 
-			this.stopBitsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripComboBox2});
-			this.stopBitsToolStripMenuItem.Name = "stopBitsToolStripMenuItem";
-			this.stopBitsToolStripMenuItem.Size = new System.Drawing.Size(126, 22);
-			this.stopBitsToolStripMenuItem.Text = "StopBits";
+			this.ms_sp_stopBits.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.ms_sp_stop_combobox});
+			this.ms_sp_stopBits.Name = "ms_sp_stopBits";
+			this.ms_sp_stopBits.Size = new System.Drawing.Size(152, 22);
+			this.ms_sp_stopBits.Text = "StopBits";
 			// 
-			// toolStripComboBox2
+			// ms_sp_stop_combobox
 			// 
-			this.toolStripComboBox2.Name = "toolStripComboBox2";
-			this.toolStripComboBox2.Size = new System.Drawing.Size(121, 23);
+			this.ms_sp_stop_combobox.Name = "ms_sp_stop_combobox";
+			this.ms_sp_stop_combobox.Size = new System.Drawing.Size(121, 23);
+			this.ms_sp_stop_combobox.SelectedIndexChanged += new System.EventHandler(this.ms_sp_stop_combobox_SelectedIndexChanged);
 			// 
 			// ms_sp_conect
 			// 
 			this.ms_sp_conect.Name = "ms_sp_conect";
-			this.ms_sp_conect.Size = new System.Drawing.Size(126, 22);
+			this.ms_sp_conect.Size = new System.Drawing.Size(152, 22);
 			this.ms_sp_conect.Text = "Conect";
 			this.ms_sp_conect.Click += new System.EventHandler(this.ms_sp_conect_Click);
 			// 
@@ -168,7 +170,7 @@
 			// 
 			this.ms_sp_disconect.Enabled = false;
 			this.ms_sp_disconect.Name = "ms_sp_disconect";
-			this.ms_sp_disconect.Size = new System.Drawing.Size(126, 22);
+			this.ms_sp_disconect.Size = new System.Drawing.Size(152, 22);
 			this.ms_sp_disconect.Text = "Disconect";
 			this.ms_sp_disconect.Click += new System.EventHandler(this.ms_sp_disconect_Click);
 			// 
@@ -662,10 +664,10 @@
 		private System.Windows.Forms.TextBox tb_cur_tem;
 		private System.Windows.Forms.Label label12;
 		private System.Windows.Forms.Label label16;
-		private System.Windows.Forms.ToolStripMenuItem parityToolStripMenuItem;
-		private System.Windows.Forms.ToolStripComboBox toolStripComboBox1;
-		private System.Windows.Forms.ToolStripMenuItem stopBitsToolStripMenuItem;
-		private System.Windows.Forms.ToolStripComboBox toolStripComboBox2;
+		private System.Windows.Forms.ToolStripMenuItem ms_sp_parity;
+		private System.Windows.Forms.ToolStripComboBox ms_sp_par_combobox;
+		private System.Windows.Forms.ToolStripMenuItem ms_sp_stopBits;
+		private System.Windows.Forms.ToolStripComboBox ms_sp_stop_combobox;
 		private System.Windows.Forms.Button btn_test;
 	}
 }

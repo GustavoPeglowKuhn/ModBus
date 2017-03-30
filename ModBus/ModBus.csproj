@@ -54,6 +54,7 @@
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
     <Compile Include="Message.cs" />
+    <Compile Include="MessageType.cs" />
     <Compile Include="ModBusPort.cs">
       <SubType>Component</SubType>
     </Compile>

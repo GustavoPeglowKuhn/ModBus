@@ -11,13 +11,35 @@ namespace ModBus {
 	delegate void MessageTimeOutEventHandler(object source, MessageTimeOutEventArgs e);
 
 	class ModBusPort : System.IO.Ports.SerialPort {
+		//
+		// Summary:
+		//     Invoke when a message is received from any slave.
 		public event MessageReceivedEventHandler MessageReceived;
+		//
+		// Summary:
+		//     Invoke if no message is received in time from the slave.
 		public event MessageTimeOutEventHandler MessageTimeOut;
 
+		//
+		// Summary:
+		//     The time of 3.5 char is used to indicate the end of the frame/message.
 		System.Timers.Timer tmr_3_5char = new System.Timers.Timer();
-		System.Timers.Timer tmr_TimeOut = new System.Timers.Timer();	//use this to see if is waiting a message
+		//
+		// Summary:
+		//     Indicate that the slave is ofline or don't received last message.
+		System.Timers.Timer tmr_TimeOut = new System.Timers.Timer();    //use this to see if is waiting a message
+		//
+		// Summary:
+		//     List of all bytes received by System.IO.Ports.SerialPort,
+		//     the will be used to make a Message.
 		List<byte> buffer = new List<byte>();
+		//
+		// Summary:
+		//     Indicate that the master is waiting a message from any slave.
 		bool waitingMessage = false;
+		//
+		// Summary:
+		//     Queue of Messages to send after receive answer to the last quest.
 		Queue<Message> writeBuffer = new Queue<Message>(); //coloca as mensagens na fila caso esteja esperando a resposta de um servo
 		//Queue<KeyValuePair<Message, Message>> readBuffer = new Queue<KeyValuePair<Message, Message>>();  //coloca as mensagens na fila até o usuario ler
 
@@ -85,6 +107,13 @@ namespace ModBus {
 			waitingMessage=false;
 		}
 
+		//
+		// Summary:
+		//     Add a message to the writeBuffer of the ModBusPot object.
+		//
+		// Parameters:
+		//   message:
+		//     the message to be added in the queue.
 		public void EscreverMensagem(Message message) {
 			writeBuffer.Enqueue(message);
 			SendMesssage();
@@ -98,6 +127,10 @@ namespace ModBus {
 			return readBuffer.Dequeue();
 		}*/
 
+		//
+		// Summary:
+		//     Calculate the time in miliseconds to the
+		//     System.IO.Ports.SerialPort send one byte.
 		private float timeChar_ms() {
 			float bpc;
 			if(StopBits==System.IO.Ports.StopBits.None) bpc=0;
@@ -108,11 +141,14 @@ namespace ModBus {
 			bpc+=9;		//8 bits + start_bit
 			return 1000f * bpc/BaudRate;	//em milisegundos para o timer
 		}
-
+		//
+		// Summary:
+		//     Send a copy of the last message of the writeBuffer to the 
+		//     System.IO.Ports.SerialPort.
 		private void SendMesssage() {
 			//if(waitingMessage)			throw new ModBusException("busy");
-			//if(waitingMessage) return;  //ModBusPort is busy now
-			if(tmr_TimeOut.Enabled) return;  //ModBusPort is busy now
+			if(waitingMessage) return;  //ModBusPort is busy now
+			//if(tmr_TimeOut.Enabled) return;  //ModBusPort is busy now		//melhor usar waitingMessage pois ela só é trocada para false depois de limpar os buffers
 			if(writeBuffer.Count==0) return;	//Nothing to write
 			Message message = writeBuffer.Last();
 			Write(message.GetMessage().ToArray(), 0, message.GetMessage().Count);
@@ -122,6 +158,10 @@ namespace ModBus {
 			}
 		}
 
+		//
+		// Summary:
+		//     Read a message from System.IO.Ports.SerialPort input buffer
+		//     and invoke the event MessageReseved with the message as arg.
 		private void ReadMesssage() {   //par pergunta/resposta
 			int i = buffer.Count();
 			if(i>4) {  //ver o tamanho da menor mensagem valida (provavelmente eh 6)

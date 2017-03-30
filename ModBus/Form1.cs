@@ -15,19 +15,19 @@ namespace ModBus {
 
 		//Motor[] motors = new Motor[3];		// o quarto motor é controlado pelo kit (assim espero)
 		//a classe Motor foi pensada para o supervisorio fica rmonitorando o motor e trocar de estrela para triangulo
-		
+
 		enum e_devices : byte { broadcast, kl25 };
 		static string[] devices = { "broadcast", "kl25" };
 
 		enum e_motorState : byte { desligado, estrela, triangulo };
 		byte[] motorState = { (byte)e_motorState.desligado, (byte)e_motorState.desligado, (byte)e_motorState.desligado, (byte)e_motorState.desligado };
 
-		enum mesages_num : byte { broadcast, set_coins, read_cois };	//search the real values
-
 		//enum BaudRate { asd, assd};
 		static int[] iBaudRate = { 9600, 14400, 19200, 38400, 57600, 115200, 128000, 256000 };
 		//static string[] sBaudRate = { "9600", "14400", "19200", "38400", "57600", "115200", "128000", "256000" };
 
+		static string[] stopBits = { "One", "Two" };    //see System.IO.Ports.StopBits	//None e OnePointFive nao suportados
+		static string[] parity = { "None", "Odd", "Even", "Mark", "Space" };    //see System.IO.Ports.Parity
 
 		bool[] refreshMotorTime = {true, true, true, true};
 		bool refreshTemperature = true;
@@ -39,7 +39,10 @@ namespace ModBus {
 				ms_sp_baud_combobox.Items.Add(i.ToString());
 			//ms_sp_baud_combobox.Items.AddRange(sBaudRate);
 			lbl_dType.Text = "kl25";
-			
+
+			ms_sp_stop_combobox.Items.AddRange(stopBits);
+			ms_sp_par_combobox.Items.AddRange(parity);
+
 			nud_m1.ValueChanged+=delegate { refreshMotorTime[0]=true; };
 			nud_m2.ValueChanged+=delegate { refreshMotorTime[1]=true; };
 			nud_m3.ValueChanged+=delegate { refreshMotorTime[2]=true; };
@@ -74,11 +77,11 @@ namespace ModBus {
 			par=e.MessagePair;
 			if(par.Value.GetDevice()==(byte)e_devices.kl25) {
 				switch(par.Value.GetMessageType()) {
-					case (byte)mesages_num.read_cois:   //message 1
-
+					case (byte)MessageType.ReadNCoils:   //message 1
+						//code here;
 					break;
-					case (byte)Message.MessageType.broadcast:
-					//code here too;
+					case (byte)MessageType.broadcast:	//what???? nunca vai ter resposta a uma mensagem broadcast
+					//code here too;		//so se for codigo de tratamento de erro alemao maluco
 					break;
 				}
 			}
@@ -173,6 +176,13 @@ namespace ModBus {
 			} catch(Exception) {
 				MessageBox.Show("Unable to disconect this serial port", "Disconect Error");
 			}
+		}
+
+		private void ms_sp_stop_combobox_SelectedIndexChanged(object sender, EventArgs e) {
+			modBusPort.StopBits=(System.IO.Ports.StopBits)ms_sp_stop_combobox.SelectedIndex + 1;
+		}
+		private void ms_sp_par_combobox_SelectedIndexChanged(object sender, EventArgs e) {
+			modBusPort.Parity=(System.IO.Ports.Parity)ms_sp_par_combobox.SelectedIndex;
 		}
 
 		private void Form1_FormClosing(object sender, FormClosingEventArgs e) {
