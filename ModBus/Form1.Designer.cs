@@ -53,12 +53,12 @@
 			this.label9 = new System.Windows.Forms.Label();
 			this.nud_m4 = new System.Windows.Forms.NumericUpDown();
 			this.label10 = new System.Windows.Forms.Label();
-			this.button1 = new System.Windows.Forms.Button();
-			this.button2 = new System.Windows.Forms.Button();
-			this.button3 = new System.Windows.Forms.Button();
-			this.button4 = new System.Windows.Forms.Button();
-			this.button5 = new System.Windows.Forms.Button();
-			this.button6 = new System.Windows.Forms.Button();
+			this.btn_m1_on = new System.Windows.Forms.Button();
+			this.btn_m1_off = new System.Windows.Forms.Button();
+			this.btn_m2_off = new System.Windows.Forms.Button();
+			this.btn_m2_on = new System.Windows.Forms.Button();
+			this.btn_m3_off = new System.Windows.Forms.Button();
+			this.btn_m3_on = new System.Windows.Forms.Button();
 			this.label11 = new System.Windows.Forms.Label();
 			this.lbl_status_m1 = new System.Windows.Forms.Label();
 			this.lbl_status_m2 = new System.Windows.Forms.Label();
@@ -107,7 +107,7 @@
 			this.ms_sp_port.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.ms_sp_port_combobox});
 			this.ms_sp_port.Name = "ms_sp_port";
-			this.ms_sp_port.Size = new System.Drawing.Size(152, 22);
+			this.ms_sp_port.Size = new System.Drawing.Size(126, 22);
 			this.ms_sp_port.Text = "Port";
 			// 
 			// ms_sp_port_combobox
@@ -122,7 +122,7 @@
 			this.ms_sp_baud.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.ms_sp_baud_combobox});
 			this.ms_sp_baud.Name = "ms_sp_baud";
-			this.ms_sp_baud.Size = new System.Drawing.Size(152, 22);
+			this.ms_sp_baud.Size = new System.Drawing.Size(126, 22);
 			this.ms_sp_baud.Text = "BaudRate";
 			// 
 			// ms_sp_baud_combobox
@@ -136,7 +136,7 @@
 			this.ms_sp_parity.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.ms_sp_par_combobox});
 			this.ms_sp_parity.Name = "ms_sp_parity";
-			this.ms_sp_parity.Size = new System.Drawing.Size(152, 22);
+			this.ms_sp_parity.Size = new System.Drawing.Size(126, 22);
 			this.ms_sp_parity.Text = "Parity";
 			// 
 			// ms_sp_par_combobox
@@ -150,7 +150,7 @@
 			this.ms_sp_stopBits.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.ms_sp_stop_combobox});
 			this.ms_sp_stopBits.Name = "ms_sp_stopBits";
-			this.ms_sp_stopBits.Size = new System.Drawing.Size(152, 22);
+			this.ms_sp_stopBits.Size = new System.Drawing.Size(126, 22);
 			this.ms_sp_stopBits.Text = "StopBits";
 			// 
 			// ms_sp_stop_combobox
@@ -162,7 +162,7 @@
 			// ms_sp_conect
 			// 
 			this.ms_sp_conect.Name = "ms_sp_conect";
-			this.ms_sp_conect.Size = new System.Drawing.Size(152, 22);
+			this.ms_sp_conect.Size = new System.Drawing.Size(126, 22);
 			this.ms_sp_conect.Text = "Conect";
 			this.ms_sp_conect.Click += new System.EventHandler(this.ms_sp_conect_Click);
 			// 
@@ -170,7 +170,7 @@
 			// 
 			this.ms_sp_disconect.Enabled = false;
 			this.ms_sp_disconect.Name = "ms_sp_disconect";
-			this.ms_sp_disconect.Size = new System.Drawing.Size(152, 22);
+			this.ms_sp_disconect.Size = new System.Drawing.Size(126, 22);
 			this.ms_sp_disconect.Text = "Disconect";
 			this.ms_sp_disconect.Click += new System.EventHandler(this.ms_sp_disconect_Click);
 			// 
@@ -388,59 +388,59 @@
 			this.label10.TabIndex = 25;
 			this.label10.Text = "Tempo M4:";
 			// 
-			// button1
+			// btn_m1_on
 			// 
-			this.button1.Location = new System.Drawing.Point(398, 75);
-			this.button1.Name = "button1";
-			this.button1.Size = new System.Drawing.Size(35, 23);
-			this.button1.TabIndex = 28;
-			this.button1.Text = "On";
-			this.button1.UseVisualStyleBackColor = true;
+			this.btn_m1_on.Location = new System.Drawing.Point(398, 75);
+			this.btn_m1_on.Name = "btn_m1_on";
+			this.btn_m1_on.Size = new System.Drawing.Size(35, 23);
+			this.btn_m1_on.TabIndex = 28;
+			this.btn_m1_on.Text = "On";
+			this.btn_m1_on.UseVisualStyleBackColor = true;
 			// 
-			// button2
+			// btn_m1_off
 			// 
-			this.button2.Location = new System.Drawing.Point(439, 75);
-			this.button2.Name = "button2";
-			this.button2.Size = new System.Drawing.Size(35, 23);
-			this.button2.TabIndex = 29;
-			this.button2.Text = "Off";
-			this.button2.UseVisualStyleBackColor = true;
+			this.btn_m1_off.Location = new System.Drawing.Point(439, 75);
+			this.btn_m1_off.Name = "btn_m1_off";
+			this.btn_m1_off.Size = new System.Drawing.Size(35, 23);
+			this.btn_m1_off.TabIndex = 29;
+			this.btn_m1_off.Text = "Off";
+			this.btn_m1_off.UseVisualStyleBackColor = true;
 			// 
-			// button3
+			// btn_m2_off
 			// 
-			this.button3.Location = new System.Drawing.Point(439, 101);
-			this.button3.Name = "button3";
-			this.button3.Size = new System.Drawing.Size(35, 23);
-			this.button3.TabIndex = 31;
-			this.button3.Text = "Off";
-			this.button3.UseVisualStyleBackColor = true;
+			this.btn_m2_off.Location = new System.Drawing.Point(439, 101);
+			this.btn_m2_off.Name = "btn_m2_off";
+			this.btn_m2_off.Size = new System.Drawing.Size(35, 23);
+			this.btn_m2_off.TabIndex = 31;
+			this.btn_m2_off.Text = "Off";
+			this.btn_m2_off.UseVisualStyleBackColor = true;
 			// 
-			// button4
+			// btn_m2_on
 			// 
-			this.button4.Location = new System.Drawing.Point(398, 101);
-			this.button4.Name = "button4";
-			this.button4.Size = new System.Drawing.Size(35, 23);
-			this.button4.TabIndex = 30;
-			this.button4.Text = "On";
-			this.button4.UseVisualStyleBackColor = true;
+			this.btn_m2_on.Location = new System.Drawing.Point(398, 101);
+			this.btn_m2_on.Name = "btn_m2_on";
+			this.btn_m2_on.Size = new System.Drawing.Size(35, 23);
+			this.btn_m2_on.TabIndex = 30;
+			this.btn_m2_on.Text = "On";
+			this.btn_m2_on.UseVisualStyleBackColor = true;
 			// 
-			// button5
+			// btn_m3_off
 			// 
-			this.button5.Location = new System.Drawing.Point(439, 127);
-			this.button5.Name = "button5";
-			this.button5.Size = new System.Drawing.Size(35, 23);
-			this.button5.TabIndex = 33;
-			this.button5.Text = "Off";
-			this.button5.UseVisualStyleBackColor = true;
+			this.btn_m3_off.Location = new System.Drawing.Point(439, 127);
+			this.btn_m3_off.Name = "btn_m3_off";
+			this.btn_m3_off.Size = new System.Drawing.Size(35, 23);
+			this.btn_m3_off.TabIndex = 33;
+			this.btn_m3_off.Text = "Off";
+			this.btn_m3_off.UseVisualStyleBackColor = true;
 			// 
-			// button6
+			// btn_m3_on
 			// 
-			this.button6.Location = new System.Drawing.Point(398, 127);
-			this.button6.Name = "button6";
-			this.button6.Size = new System.Drawing.Size(35, 23);
-			this.button6.TabIndex = 32;
-			this.button6.Text = "On";
-			this.button6.UseVisualStyleBackColor = true;
+			this.btn_m3_on.Location = new System.Drawing.Point(398, 127);
+			this.btn_m3_on.Name = "btn_m3_on";
+			this.btn_m3_on.Size = new System.Drawing.Size(35, 23);
+			this.btn_m3_on.TabIndex = 32;
+			this.btn_m3_on.Text = "On";
+			this.btn_m3_on.UseVisualStyleBackColor = true;
 			// 
 			// label11
 			// 
@@ -579,12 +579,12 @@
 			this.Controls.Add(this.label13);
 			this.Controls.Add(this.lbl_status_m1);
 			this.Controls.Add(this.label11);
-			this.Controls.Add(this.button5);
-			this.Controls.Add(this.button6);
-			this.Controls.Add(this.button3);
-			this.Controls.Add(this.button4);
-			this.Controls.Add(this.button2);
-			this.Controls.Add(this.button1);
+			this.Controls.Add(this.btn_m3_off);
+			this.Controls.Add(this.btn_m3_on);
+			this.Controls.Add(this.btn_m2_off);
+			this.Controls.Add(this.btn_m2_on);
+			this.Controls.Add(this.btn_m1_off);
+			this.Controls.Add(this.btn_m1_on);
 			this.Controls.Add(this.label9);
 			this.Controls.Add(this.nud_m4);
 			this.Controls.Add(this.label10);
@@ -647,12 +647,12 @@
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.NumericUpDown nud_m4;
         private System.Windows.Forms.Label label10;
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Button button2;
-        private System.Windows.Forms.Button button3;
-        private System.Windows.Forms.Button button4;
-        private System.Windows.Forms.Button button5;
-        private System.Windows.Forms.Button button6;
+        private System.Windows.Forms.Button btn_m1_on;
+        private System.Windows.Forms.Button btn_m1_off;
+        private System.Windows.Forms.Button btn_m2_off;
+        private System.Windows.Forms.Button btn_m2_on;
+        private System.Windows.Forms.Button btn_m3_off;
+        private System.Windows.Forms.Button btn_m3_on;
         private System.Windows.Forms.Label label11;
         private System.Windows.Forms.Label lbl_status_m1;
 		private System.Windows.Forms.Label lbl_status_m2;

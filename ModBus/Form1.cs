@@ -21,6 +21,7 @@ namespace ModBus {
 
 		enum e_motorState : byte { desligado, estrela, triangulo };
 		byte[] motorState = { (byte)e_motorState.desligado, (byte)e_motorState.desligado, (byte)e_motorState.desligado, (byte)e_motorState.desligado };
+		string[] s_motorState = { "desligado", "estrela", "triangulo" };
 
 		//enum BaudRate { asd, assd};
 		static int[] iBaudRate = { 9600, 14400, 19200, 38400, 57600, 115200, 128000, 256000 };
@@ -29,7 +30,9 @@ namespace ModBus {
 		static string[] stopBits = { "One", "Two" };    //see System.IO.Ports.StopBits	//None e OnePointFive nao suportados
 		static string[] parity = { "None", "Odd", "Even", "Mark", "Space" };    //see System.IO.Ports.Parity
 
-		bool[] refreshMotorTime = {true, true, true, true};
+		//bool[] refreshMotorTime = {true, true, true, true};
+		bool[] MotorState = { false, false, false, false };
+		bool refreshMotorTime = true;
 		bool refreshTemperature = true;
 
 		public Form1() {
@@ -43,11 +46,22 @@ namespace ModBus {
 			ms_sp_stop_combobox.Items.AddRange(stopBits);
 			ms_sp_par_combobox.Items.AddRange(parity);
 
-			nud_m1.ValueChanged+=delegate { refreshMotorTime[0]=true; };
+			/*nud_m1.ValueChanged+=delegate { refreshMotorTime[0]=true; };
 			nud_m2.ValueChanged+=delegate { refreshMotorTime[1]=true; };
 			nud_m3.ValueChanged+=delegate { refreshMotorTime[2]=true; };
-			nud_m4.ValueChanged+=delegate { refreshMotorTime[3]=true; };
+			nud_m4.ValueChanged+=delegate { refreshMotorTime[3]=true; };*/
+			nud_m1.ValueChanged+=delegate { refreshMotorTime=true; };
+			nud_m2.ValueChanged+=delegate { refreshMotorTime=true; };
+			nud_m3.ValueChanged+=delegate { refreshMotorTime=true; };
+			nud_m4.ValueChanged+=delegate { refreshMotorTime=true; };
 			tb_set_tem.TextChanged+=delegate { refreshTemperature=true; };
+
+			btn_m1_on.Click+=delegate { MotorState[0]=true; };
+			btn_m2_on.Click+=delegate { MotorState[1]=true; };
+			btn_m3_on.Click+=delegate { MotorState[2]=true; };
+			btn_m1_off.Click+=delegate { MotorState[0]=false; };
+			btn_m2_off.Click+=delegate { MotorState[1]=false; };
+			btn_m3_off.Click+=delegate { MotorState[2]=false; };
 
 			//modBusPort.MessageReceived+=delegate { InterpretaMensagem(); }; //modBusPort.t.Elapsed+=delegate { InterpretaMensagem(); };
 			refreshTimer.Elapsed+=delegate { RefreshRegisters(); };
@@ -80,8 +94,19 @@ namespace ModBus {
 					case (byte)MessageType.ReadNCoils:   //message 1
 						//code here;
 					break;
-					case (byte)MessageType.broadcast:	//what???? nunca vai ter resposta a uma mensagem broadcast
-					//code here too;		//so se for codigo de tratamento de erro alemao maluco
+						case (byte)MessageType.WriteNHoldingRegisters:
+							switch(par.Key.GetBody()[1]){
+								case 0x20:	//set valor de temperatura ok
+								break;
+								case 0x22:	//set tempo de motores ok
+								break;
+							}
+					break;
+					case (byte)MessageType.ReadNHoldingRegisters:
+						List<byte> bv = par.Value.GetMessage();
+						float temperatura = 0;
+						//temperatura =  bv[1] e[2];
+						tb_cur_tem.Text=temperatura.ToString();
 					break;
 				}
 			}
@@ -92,36 +117,45 @@ namespace ModBus {
 		}
 
 		public void RefreshRegisters() {
-			if(refreshMotorTime[0]) { /*write in hold register*/
-				int time = (int)nud_m1.Value;
-				/*send message*/
-				refreshMotorTime[0]=false;
-			}
-			if(refreshMotorTime[1]) { /*write in hold register*/
-				int time = (int)nud_m1.Value;
-				/*send message*/
-				refreshMotorTime[0]=false;
-			}
-			if(refreshMotorTime[2]) { /*write in hold register*/
-				int time = (int)nud_m1.Value;
-				/*send message*/
-				refreshMotorTime[0]=false;
-			}
-			if(refreshMotorTime[3]) { /*write in hold register*/
-				int time = (int)nud_m1.Value;
-				/*send message*/
-				refreshMotorTime[0]=false;
+			if(refreshMotorTime) { //write in hold register
+				List<ushort> temp = new List<ushort>();
+				temp.Add((ushort)nud_m1.Value);
+				temp.Add((ushort)nud_m1.Value);
+				temp.Add((ushort)nud_m1.Value);
+				temp.Add((ushort)nud_m1.Value);
+				modBusPort.EscreverMensagem(Message.WriteNHoldingRegisters(1, 0x22, temp ));
+				refreshMotorTime =false;
 			}
 			if(refreshTemperature) { /*write in hold register*/
 				try {
-					float temp = float.Parse(tb_set_tem.Text.ToString());
-					/*send message*/
+					float ftemp = float.Parse(tb_set_tem.Text.ToString());
+					List<ushort> temp = new List<ushort>();
+					byte[] vec = BitConverter.GetBytes(ftemp);
+					//temp.AddRange(vec);
+
+					modBusPort.EscreverMensagem(Message.WriteNHoldingRegisters(1, 0x22, temp));
 				} catch(Exception) {
 					MessageBox.Show("Temperatura invalida");
 				}
 				refreshTemperature=false;
 			}
-			/*Ler a temperatura do lm35, o estado dos motores (desligado, estrela, triangulo), o teclado e o display(IHM)*/
+			//modBusPort.EscreverMensagem(Message.ReadNHoldingRegisters(1, 0x18, ));
+			modBusPort.EscreverMensagem(Message.ReadNCoils(1, 0, 16));	//ver se é 8 ou 16
+			if(MotorState[0] &&lbl_status_m1.Text==s_motorState[0]) {
+				//ligar motor 1
+			}else if(!MotorState[0]&&lbl_status_m1.Text!=s_motorState[0]) {
+				//desligar motor 1
+			}
+			if(MotorState[1]&&lbl_status_m2.Text==s_motorState[0]) {
+				//ligar motor 1
+			} else if(!MotorState[1]&&lbl_status_m2.Text!=s_motorState[0]) {
+				//desligar motor 1
+			}
+			if(MotorState[2]&&lbl_status_m3.Text==s_motorState[0]) {
+				//ligar motor 1
+			} else if(!MotorState[2]&&lbl_status_m3.Text!=s_motorState[0]) {
+				//desligar motor 1
+			}
 		}
 
 		private void ms_sp_port_combobox_DropDown(object sender, EventArgs e) {
@@ -211,6 +245,7 @@ namespace ModBus {
 
 		private void btn_test_Click(object sender, EventArgs e) {   //so para teste
 			try {
+				//Message.WriteNHoldingRegisters(1, 0x22, new List<ushort>());
 				modBusPort.EscreverMensagem(Message.ReadNCoils(01, 00, 8));
 			} catch(Exception) { }
 		}
