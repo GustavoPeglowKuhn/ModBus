@@ -26,7 +26,7 @@ namespace ModBus {
 			message.Add(device);
 			message.Add(mType);
 			message.AddRange(body);
-			byte[] crc = Crc.Calculate(message);    //Criar algoritimo do crc
+			byte[] crc = Crc.Calculate(message);    //Testar algoritimo do crc
 //			message.AddRange(crc);
 			message.Add(crc[1]);	//CRC LO
 			message.Add(crc[0]);	//CRC HI
@@ -192,6 +192,26 @@ namespace ModBus {
 				body[5+2*i]=aux[1];		//iezimo valor HI
 				body[6+2*i]=aux[0];     //iezimo valor LO
 			}
+
+			return new Message(dispositivo, (byte)MessageType.WriteNHoldingRegisters, body);
+		}
+		/*Message 16 - Write n coils*/
+		//o numero de Holding Registers é o tamanho da lista dividido por 2
+		//list deve conter o mais significavo com indice 0, por exemplo {0x12, 0x34, 0xab, 0xcd} sera enviado 0x1234 para startingAddress e 0xabcd para startingAddress+1
+		static public Message WriteNHoldingRegisters(byte dispositivo, ushort startingAddress, byte[] list) {
+			ushort nRegisters = (ushort)(list.Length/2);    //cada HoldingRegisters e de 16 bits
+			if(nRegisters>120) throw new BadMessage("More than 120 Registers"); ;   //limite do protocolo
+
+			byte[] fisrt = BitConverter.GetBytes(startingAddress);
+			byte[] num = BitConverter.GetBytes(nRegisters);
+			byte[] body = new byte[5+2*nRegisters];
+			body[0]=fisrt[1];
+			body[1]=fisrt[0];
+			body[2]=num[1];
+			body[3]=num[0];
+			body[4]=(byte)nRegisters;
+
+			for(int i = 0; i<list.Length; i++) body[5+i]=list[i];
 
 			return new Message(dispositivo, (byte)MessageType.WriteNHoldingRegisters, body);
 		}

@@ -98,6 +98,9 @@ namespace ModBus {
 			tmr_TimeOut.Interval=charTime*1000;	//planejar esse tempo depois
 			base.Open();
 			DiscardInBuffer();
+
+			buffer.Clear();
+			writeBuffer.Clear();
 		}
 		public new void Close() {
 			tmr_3_5char.Enabled=false;
@@ -121,11 +124,6 @@ namespace ModBus {
 				try { SendMesssage(); } catch(ModBusException) { }
 			}*/
 		}
-		/*public KeyValuePair<Message, Message> LerMensagem() {
-			if(readBuffer.Count()==0)
-				throw new ModBusException("nothing to read");
-			return readBuffer.Dequeue();
-		}*/
 
 		//
 		// Summary:
