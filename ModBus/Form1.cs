@@ -96,12 +96,14 @@ namespace ModBus {
 			if(par.Value.GetDevice()==(byte)e_devices.kl25) {
 				switch(par.Value.GetMessageType()) {
 					case (byte)MessageType.ReadNCoils:   //message 1
-						//code here;
+						if(par.Key.GetBody()[0]!=1) return;
+						//BitConverter.
+
 
 						//talez colocar o codigo de ligar e desligar os motores aqui, logo apos ler o estado atual deles
 						break;
-					case (byte)MessageType.WriteNHoldingRegisters:
-						switch(par.Key.GetBody()[1]) {
+					case (byte)MessageType.WriteNHoldingRegisters:	//aqui nao precisa fazer nada	//drink a beer
+						switch(par.Key.GetBody()[1]) {	
 							case 0x20:  //set valor de temperatura ok
 								break;
 							case 0x22:  //set tempo de motores ok
@@ -111,15 +113,15 @@ namespace ModBus {
 					case (byte)MessageType.ReadNHoldingRegisters:
 						List<byte> bv = par.Value.GetMessage();
 						if(bv[0]!=2) return;                    //se for a leitura de mais de 2 HoldingRegisters (um float 32 bits)
-						if(par.Key.GetBody()[1]!=0x18) return;  // so é feita a leitura da temperatura
-						if(bv.Count!=6) return;             //verificar //2B para o numero de bytes e 4 para o float
+						if(par.Key.GetBody()[1]!=0x18) return;  // so é feita a leitura da temperatura	//adrress
+						if(bv.Count!=6) return;					//verificar //2B para o numero de bytes e 4 para o float
 						float temperatura = 0;
 						byte[] temp = new byte[4];
 						temp[3]=bv[1];
 						temp[2]=bv[2];
 						temp[1]=bv[3];
 						temp[0]=bv[4];
-						temperatura=BitConverter.ToSingle(temp, 1);
+						temperatura=BitConverter.ToSingle(temp, 2);
 						tb_cur_tem.Text=temperatura.ToString();
 						break;
 				}
@@ -260,7 +262,8 @@ namespace ModBus {
 
 		private void btn_test_Click(object sender, EventArgs e) {   //so para teste
 			try {
-				modBusPort.EscreverMensagem(Message.ReadNCoils(01, 00, 8));
+				//modBusPort.EscreverMensagem(Message.ReadNHoldingRegisters(1, 0x18, 2));
+				modBusPort.EscreverMensagem(Message.ReadNCoils(1, 0x00, 16));
 			} catch(Exception) { }
 		}
 	}

@@ -56,8 +56,9 @@ namespace ModBus {
 			DataReceived+=delegate {
 				tmr_TimeOut.Enabled=false;
 				tmr_3_5char.Enabled=false;
-				byte[] smallBuffer = new byte[BytesToRead];
-				Read(smallBuffer, 0, BytesToRead);
+				int s = BytesToRead;
+				byte[] smallBuffer = new byte[s];
+				Read(smallBuffer, 0, s);
 				buffer.AddRange(smallBuffer);
 				if(buffer.Count()>255) {
 					buffer.Clear();
@@ -169,8 +170,10 @@ namespace ModBus {
 					KeyValuePair<Message, Message> messagePair = new KeyValuePair<Message, Message>(mes, new Message(buffer));
 					MessageReceived?.Invoke(this, new MessageReceivedEventArgs(messagePair));
 				} catch(CrcError) {//pode ser jogada uma excecao pelo "Message(byte[])"
-					//BadMessagesQueue.Enqueue();
-					//BadMessageReceived?.Invoke(this, new EventArgs());
+								   //BadMessagesQueue.Enqueue();
+								   //BadMessageReceived?.Invoke(this, new EventArgs());
+				} catch(Exception) {
+
 				}
 			}else {
 				writeBuffer.Dequeue();	//remove a mensagem que foi respondida corretamente

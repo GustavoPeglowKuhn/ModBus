@@ -18,7 +18,10 @@ namespace ModBus {
 			message.Add(mType);
 			message.AddRange(body);
 			byte[] crc = Crc.Calculate(message);    //Criar algoritimo do crc
-			message.AddRange(crc);
+			//message.AddRange(crc);
+			message.Add(crc[1]);    //CRC LO
+			message.Add(crc[0]);    //CRC HI
+
 		}
 
 		public Message(byte device, byte mType, byte[] body) {
@@ -58,7 +61,7 @@ namespace ModBus {
 
 		public bool CheckCrc() {
 			byte[] crc = Crc.Calculate(message.GetRange(0, message.Count-2));
-			if(crc[0]==message[message.Count-2] && crc[1]==message[message.Count-1])    //Criar algoritimo do crc
+			if(crc[1]==message[message.Count-2] && crc[0]==message[message.Count-1])    //Criar algoritimo do crc
 				return true;
 			return false;
 		}
