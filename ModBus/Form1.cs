@@ -15,28 +15,33 @@ namespace ModBus {
 
 		string folder = "%APPDATA%/ModBusPort/";	//pasta onde serão salvos os log do programa
 
-		//Motor[] motors = new Motor[3];		// o quarto motor é controlado pelo kit (assim espero)
-		//a classe Motor foi pensada para o supervisorio fica rmonitorando o motor e trocar de estrela para triangulo
-
 		enum e_devices : byte { broadcast, kl25 };
 		static string[] devices = { "broadcast", "kl25" };
 
 		enum e_motorState : byte { desligado, estrela, triangulo };
 		//byte[] motorState = { (byte)e_motorState.desligado, (byte)e_motorState.desligado, (byte)e_motorState.desligado, (byte)e_motorState.desligado };
-		string[] s_motorState = { "desligado", "estrela", "triangulo" };
-		bool[] b_motorState = { false, false, false, false };
+		string[] s_motorState = { "desligado", "estrela", "triangulo", "est e tri" };
+		bool[] motorUserComand = { false, false, false, false };
+		byte B_motorState = 0x00;
 
+		float temperatura;
 
 		static int[] iBaudRate = { 9600, 14400, 19200, 38400, 57600, 115200, 128000, 256000 };
 		//static string[] sBaudRate = { "9600", "14400", "19200", "38400", "57600", "115200", "128000", "256000" };
 
 		static string[] stopBits = { "One", "Two" };    //see System.IO.Ports.StopBits	//None e OnePointFive nao suportados
 		static string[] parity = { "None", "Odd", "Even", "Mark", "Space" };    //see System.IO.Ports.Parity
-		
+
+		static char[] teclas = { '1', '2', '3', 'A', '4', '5', '6', 'B', '7', '8', '9', 'C', '*', '0', '#' };
+		static byte[] IHMmessagel1 = new byte[16];
+		static byte[] IHMmessagel2 = new byte[16];
+
 		bool refreshMotorTime = true;
 		bool refreshTemperature = true;
 
-		//int lostMessagesCount = 0; //o contador deve ser interno da classe ModBusPort. Um arquivo de log deve ser salvo em %APPDATA%/ModBusPort/errors.log.txt
+//		bool refreshLcdL1 = false;
+//		bool refreshLcdL2 = false;
+//		int lostMessagesCount = 0; //o contador deve ser interno da classe ModBusPort. Um arquivo de log deve ser salvo em %APPDATA%/ModBusPort/errors.log.txt
 
 		public Form1() {
 			InitializeComponent();
@@ -48,19 +53,19 @@ namespace ModBus {
 
 			ms_sp_stop_combobox.Items.AddRange(stopBits);
 			ms_sp_par_combobox.Items.AddRange(parity);
-						
+			
 			nud_m1.ValueChanged+=delegate { refreshMotorTime=true; };
 			nud_m2.ValueChanged+=delegate { refreshMotorTime=true; };
 			nud_m3.ValueChanged+=delegate { refreshMotorTime=true; };
 			nud_m4.ValueChanged+=delegate { refreshMotorTime=true; };
 			tb_set_tem.TextChanged+=delegate { refreshTemperature=true; };
 
-			btn_m1_on.Click+=delegate { b_motorState[0]=true; };
-			btn_m2_on.Click+=delegate { b_motorState[1]=true; };
-			btn_m3_on.Click+=delegate { b_motorState[2]=true; };
-			btn_m1_off.Click+=delegate { b_motorState[0]=false; };
-			btn_m2_off.Click+=delegate { b_motorState[1]=false; };
-			btn_m3_off.Click+=delegate { b_motorState[2]=false; };
+			btn_m1_on.Click+=delegate { motorUserComand[0]=true; };
+			btn_m2_on.Click+=delegate { motorUserComand[1]=true; };
+			btn_m3_on.Click+=delegate { motorUserComand[2]=true; };
+			btn_m1_off.Click+=delegate { motorUserComand[0]=false; };
+			btn_m2_off.Click+=delegate { motorUserComand[1]=false; };
+			btn_m3_off.Click+=delegate { motorUserComand[2]=false; };
 
 			refreshTimer.Elapsed+=delegate { RefreshRegisters(); };
 			refreshTimer.Interval=10000; //2,5s planejar esse tempo depois
@@ -73,6 +78,31 @@ namespace ModBus {
 			lbl_status_m2.Text=s_motorState[0];
 			lbl_status_m3.Text=s_motorState[0];
 			lbl_status_m4.Text=s_motorState[0];
+
+/*			tb_LDC_l1.TextChanged+=LDC_TextChanged;
+			tb_LDC_l2.TextChanged+=LDC_TextChanged;
+			tb_LDC_l1.TextChanged+=delegate { refreshLcdL1=true; };
+			tb_LDC_l2.TextChanged+=delegate { refreshLcdL2=true; };*/
+
+			IHMmessagel1[0]=(byte)'t';
+			IHMmessagel1[1]=(byte)'e';
+			IHMmessagel1[2]=(byte)'c';
+			IHMmessagel1[3]=(byte)'l';
+			IHMmessagel1[4]=(byte)'a';
+			IHMmessagel1[5]=(byte)' ';
+			for(int i=7; i<16; i++) IHMmessagel1[i]=(byte)' ';
+
+			IHMmessagel2[0]=(byte)'p';
+			IHMmessagel2[1]=(byte)'r';
+			IHMmessagel2[2]=(byte)'e';
+			IHMmessagel2[3]=(byte)'c';
+			IHMmessagel2[4]=(byte)'i';
+			IHMmessagel2[5]=(byte)'o';
+			IHMmessagel2[6]=(byte)'n';
+			IHMmessagel2[7]=(byte)'a';
+			IHMmessagel2[8]=(byte)'d';
+			IHMmessagel2[9]=(byte)'a';
+			for(int i = 10; i<16; i++) IHMmessagel1[i]=(byte)' ';
 		}
 
 		/*public void InterpretaMensagem() {
@@ -91,41 +121,102 @@ namespace ModBus {
 		}*/
 
 		private void InterpretaMensagem(object sender, MessageReceivedEventArgs e) {
-			KeyValuePair<Message, Message> par;
-			par=e.MessagePair;
-			if(par.Value.GetDevice()==(byte)e_devices.kl25) {
-				switch(par.Value.GetMessageType()) {
+			Message query = e.MessagePair.Key, answer = e.MessagePair.Value;
+
+			if(query.GetDevice()==(byte)e_devices.kl25) {
+				switch(query.GetMessageType()) {
 					case (byte)MessageType.ReadNCoils:   //message 1
-						if(par.Key.GetBody()[0]!=1) return;
-						//BitConverter.
-
-
+														 //byte 0:	*N = Quantity of Outputs / 8, if the remainder is different of 0 ⇒ N = N+1
+						if(query.GetBody()[0]!=1) return;		//só é feita leitura de 8 bits
+						B_motorState=query.GetBody()[1];		//contem a resposta dos 8 bits
+						Invoke(new EventHandler(AtualizaTelaMotores));
 						//talez colocar o codigo de ligar e desligar os motores aqui, logo apos ler o estado atual deles
 						break;
-					case (byte)MessageType.WriteNHoldingRegisters:	//aqui nao precisa fazer nada	//drink a beer
-						switch(par.Key.GetBody()[1]) {	
+					case (byte)MessageType.ReadNInputs:
+						if(query.GetBody()[0]!=2 && query.GetBody().Count()!=3) return;       //só é feita leitura de 16 bits
+						byte b;
+						int i = 0;
+						b=query.GetBody()[2];
+						for(byte mask = 0x01; mask<=0x80; mask<<=1) {
+							if((b&mask)!=0){
+								IHMmessagel1[6]=(byte)teclas[i];
+								modBusPort.EscreverMensagem(Message.WriteNHoldingRegisters(1, 0x26, IHMmessagel1));
+								modBusPort.EscreverMensagem(Message.WriteNHoldingRegisters(1, 0x36, IHMmessagel2));
+								return;
+							}
+							i++;
+						}
+						b=query.GetBody()[1];
+						for(byte mask = 0x01; mask<=0x80; mask<<=1) {
+							if((b&mask)!=0){
+								IHMmessagel1[6]=(byte)teclas[i];
+								modBusPort.EscreverMensagem(Message.WriteNHoldingRegisters(1, 0x26, IHMmessagel1));
+								modBusPort.EscreverMensagem(Message.WriteNHoldingRegisters(1, 0x36, IHMmessagel2));
+								return;
+							}
+							i++;
+						}
+						break;
+					/*case (byte)MessageType.WriteNHoldingRegisters:	//aqui nao precisa fazer nada	//drink a beer
+						switch(answer.GetBody()[1]) {	
 							case 0x20:  //set valor de temperatura ok
 								break;
 							case 0x22:  //set tempo de motores ok
 								break;
 						}
-						break;
+						break;*/
 					case (byte)MessageType.ReadNHoldingRegisters:
-						List<byte> bv = par.Value.GetMessage();
-						if(bv[0]!=2) return;                    //se for a leitura de mais de 2 HoldingRegisters (um float 32 bits)
-						if(par.Key.GetBody()[1]!=0x18) return;  // so é feita a leitura da temperatura	//adrress
-						if(bv.Count!=6) return;					//verificar //2B para o numero de bytes e 4 para o float
-						float temperatura = 0;
+						List<byte> bv = query.GetBody();
+						if(bv[0]!=4) return;                    //se for a leitura de mais de 2 HoldingRegisters (um float 32 bits)
+						if(answer.GetBody()[1]!=0x18) return;  // so é feita a leitura da temperatura	//adrress
+						if(bv.Count!=5) return;                 //verificar //2B para o numero de bytes e 4 para o float
 						byte[] temp = new byte[4];
 						temp[3]=bv[1];
 						temp[2]=bv[2];
 						temp[1]=bv[3];
 						temp[0]=bv[4];
-						temperatura=BitConverter.ToSingle(temp, 2);
-						tb_cur_tem.Text=temperatura.ToString();
+						temperatura=BitConverter.ToSingle(temp, 0);
+						Invoke(new EventHandler(AtualizaTelaTemperatura));
 						break;
+					//testar o enio antes de habilitar a funcoes de erro
+					/*case 128+(byte)MessageType.ReadNCoils:	//erro
+						break;
+					case 128+(byte)MessageType.WriteNHoldingRegisters:  //aqui nao precisa fazer nada	//drink a beer
+						switch(answer.GetBody()[1]) {
+							case 0x20:  //erro ao setar valor de temperatura
+								refreshTemperature=true;
+								break;
+							case 0x22:  //erro ao setar tempo de motores
+								refreshMotorTime=true;
+								break;
+						}
+						break;*/
 				}
 			}
+		}
+		private void AtualizaTelaMotores(object sender, EventArgs e) {
+			byte b = B_motorState;
+			byte mask = 0x03;
+			byte aux = (byte)(b&mask);
+			lbl_status_m1.Text=s_motorState[aux];
+
+			mask<<=2;
+			aux=(byte)(b&mask);
+			aux>>=2;
+			lbl_status_m2.Text=s_motorState[aux];
+
+			mask<<=2;
+			aux=(byte)(b&mask);
+			aux>>=4;
+			lbl_status_m3.Text=s_motorState[aux];
+
+			mask<<=2;
+			aux=(byte)(b&mask);
+			aux>>=6;
+			lbl_status_m4.Text=s_motorState[aux];
+		}
+		private void AtualizaTelaTemperatura(object sender, EventArgs e) {
+			tb_cur_tem.Text=temperatura.ToString();
 		}
 
 		private void InterpretaMensagemSemResposta(object sender, MessageTimeOutEventArgs e) {  //so para teste por enquanto
@@ -133,6 +224,7 @@ namespace ModBus {
 		}
 
 		public void RefreshRegisters() {
+			if(modBusPort.WaitingMessage) return;	// evita sobrecarga no buffer da porta ModBus
 			if(refreshMotorTime) { //write in 4 hold register
 				List<ushort> temp = new List<ushort>();
 				temp.Add((ushort)nud_m1.Value);
@@ -164,21 +256,47 @@ namespace ModBus {
 
 			//talvez torcar a parte de ligar e desligar para a funcao InterpretaMensagem,
 			//depois de receber a resposta do estado dos motores, dai só troca os motores que realmente precisa trocar
-			if(b_motorState[0] &&lbl_status_m1.Text==s_motorState[0]) {
+			if(motorUserComand[0] &&lbl_status_m1.Text==s_motorState[0]) {
 				//ligar motor 1
-			}else if(!b_motorState[0]&&lbl_status_m1.Text!=s_motorState[0]) {
+			}else if(!motorUserComand[0]&&lbl_status_m1.Text!=s_motorState[0]) {
 				//desligar motor 1
 			}
-			if(b_motorState[1]&&lbl_status_m2.Text==s_motorState[0]) {
+			if(motorUserComand[1]&&lbl_status_m2.Text==s_motorState[0]) {
 				//ligar motor 1
-			} else if(!b_motorState[1]&&lbl_status_m2.Text!=s_motorState[0]) {
+			} else if(!motorUserComand[1]&&lbl_status_m2.Text!=s_motorState[0]) {
 				//desligar motor 1
 			}
-			if(b_motorState[2]&&lbl_status_m3.Text==s_motorState[0]) {
+			if(motorUserComand[2]&&lbl_status_m3.Text==s_motorState[0]) {
 				//ligar motor 1
-			} else if(!b_motorState[2]&&lbl_status_m3.Text!=s_motorState[0]) {
+			} else if(!motorUserComand[2]&&lbl_status_m3.Text!=s_motorState[0]) {
 				//desligar motor 1
 			}
+
+			//LCD Change
+/*			if(refreshLcdL1) {
+				char[] l1 = tb_LDC_l1.Text.ToArray();
+				char[] l2 = new char[16];
+				
+				for(int i = 0; i<l1.Length; i++) l2[i]=l1[i];
+				for(int i = l1.Length; i<16; i++) l2[i]='0';
+
+				List<ushort> l3 = new List<ushort>();
+				for(int i = 0; i<16; i+=2) l3.Add((ushort)(256*l2[i]+l2[i+1]));
+
+				modBusPort.EscreverMensagem(Message.WriteNHoldingRegisters(1, 0x26, l3));
+			}
+			if(refreshLcdL2) {
+				char[] l1 = tb_LDC_l2.Text.ToArray();
+				char[] l2 = new char[16];
+
+				for(int i = 0; i<l1.Length; i++) l2[i]=l1[i];
+				for(int i = l1.Length; i<16; i++) l2[i]='0';
+
+				List<ushort> l3 = new List<ushort>();
+				for(int i = 0; i<16; i+=2) l3.Add((ushort)(256*l2[i]+l2[i+1]));
+
+				modBusPort.EscreverMensagem(Message.WriteNHoldingRegisters(1, 0x36, l3));
+			}*/
 		}
 
 		private void ms_sp_port_combobox_DropDown(object sender, EventArgs e) {
@@ -262,9 +380,17 @@ namespace ModBus {
 
 		private void btn_test_Click(object sender, EventArgs e) {   //so para teste
 			try {
-				//modBusPort.EscreverMensagem(Message.ReadNHoldingRegisters(1, 0x18, 2));
-				modBusPort.EscreverMensagem(Message.ReadNCoils(1, 0x00, 16));
+				modBusPort.EscreverMensagem(Message.ReadNHoldingRegisters(1, 0x18, 2));	//temperatura
+				//modBusPort.EscreverMensagem(Message.ReadNCoils(1, 0x00, 8));				//8leds
+				//modBusPort.EscreverMensagem(Message.ReadNInputs(1, 0x00, 16));              //le o teclado
 			} catch(Exception) { }
+		}
+		
+		private void LDC_TextChanged(object sender, EventArgs e) {
+			TextBox t = (TextBox)sender;
+			if(t.Text.Length>16) {
+				t.Text = t.Text.Remove(16);		//remove todos os caracteres depois do decimo sexto
+			}
 		}
 	}
 }

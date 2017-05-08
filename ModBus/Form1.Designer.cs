@@ -71,6 +71,9 @@
 			this.label12 = new System.Windows.Forms.Label();
 			this.label16 = new System.Windows.Forms.Label();
 			this.btn_test = new System.Windows.Forms.Button();
+			this.label17 = new System.Windows.Forms.Label();
+			this.tb_LDC_l1 = new System.Windows.Forms.TextBox();
+			this.tb_LDC_l2 = new System.Windows.Forms.TextBox();
 			this.menuStrip1.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.nud_dType)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.nud_m1)).BeginInit();
@@ -467,7 +470,7 @@
 			this.lbl_status_m2.AutoSize = true;
 			this.lbl_status_m2.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.lbl_status_m2.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
-			this.lbl_status_m2.Location = new System.Drawing.Point(309, 101);
+			this.lbl_status_m2.Location = new System.Drawing.Point(310, 101);
 			this.lbl_status_m2.Name = "lbl_status_m2";
 			this.lbl_status_m2.Size = new System.Drawing.Size(71, 17);
 			this.lbl_status_m2.TabIndex = 39;
@@ -477,7 +480,7 @@
 			// 
 			this.label13.AutoSize = true;
 			this.label13.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.label13.Location = new System.Drawing.Point(262, 101);
+			this.label13.Location = new System.Drawing.Point(263, 101);
 			this.label13.Name = "label13";
 			this.label13.Size = new System.Drawing.Size(52, 17);
 			this.label13.TabIndex = 38;
@@ -562,11 +565,39 @@
 			this.btn_test.UseVisualStyleBackColor = true;
 			this.btn_test.Click += new System.EventHandler(this.btn_test_Click);
 			// 
+			// label17
+			// 
+			this.label17.AutoSize = true;
+			this.label17.Location = new System.Drawing.Point(278, 284);
+			this.label17.Name = "label17";
+			this.label17.Size = new System.Drawing.Size(54, 13);
+			this.label17.TabIndex = 48;
+			this.label17.Text = "LCD 16x2";
+			// 
+			// tb_LDC_l1
+			// 
+			this.tb_LDC_l1.Location = new System.Drawing.Point(329, 277);
+			this.tb_LDC_l1.Name = "tb_LDC_l1";
+			this.tb_LDC_l1.Size = new System.Drawing.Size(119, 20);
+			this.tb_LDC_l1.TabIndex = 49;
+			this.tb_LDC_l1.Text = "Isso esta desligado";
+			// 
+			// tb_LDC_l2
+			// 
+			this.tb_LDC_l2.Location = new System.Drawing.Point(329, 294);
+			this.tb_LDC_l2.Name = "tb_LDC_l2";
+			this.tb_LDC_l2.Size = new System.Drawing.Size(119, 20);
+			this.tb_LDC_l2.TabIndex = 50;
+			this.tb_LDC_l2.Text = "perguntar para ele";
+			// 
 			// Form1
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(627, 352);
+			this.Controls.Add(this.tb_LDC_l2);
+			this.Controls.Add(this.tb_LDC_l1);
+			this.Controls.Add(this.label17);
 			this.Controls.Add(this.btn_test);
 			this.Controls.Add(this.tb_cur_tem);
 			this.Controls.Add(this.label12);
@@ -669,6 +700,9 @@
 		private System.Windows.Forms.ToolStripMenuItem ms_sp_stopBits;
 		private System.Windows.Forms.ToolStripComboBox ms_sp_stop_combobox;
 		private System.Windows.Forms.Button btn_test;
+		private System.Windows.Forms.Label label17;
+		private System.Windows.Forms.TextBox tb_LDC_l1;
+		private System.Windows.Forms.TextBox tb_LDC_l2;
 	}
 }
 

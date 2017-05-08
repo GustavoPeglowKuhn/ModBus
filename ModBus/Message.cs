@@ -56,7 +56,7 @@ namespace ModBus {
 			return message[1];
 		}
 		public List<byte> GetBody() {
-			return message.GetRange(2, message.Count-2);
+			return message.GetRange(2, message.Count-4);	// sem dispositovo, tipo e CRC
 		}
 
 		public bool CheckCrc() {

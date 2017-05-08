@@ -37,6 +37,7 @@ namespace ModBus {
 		// Summary:
 		//     Indicate that the master is waiting a message from any slave.
 		bool waitingMessage = false;
+		public bool WaitingMessage { get; }
 		//
 		// Summary:
 		//     Queue of Messages to send after receive answer to the last quest.
@@ -172,7 +173,7 @@ namespace ModBus {
 				} catch(CrcError) {//pode ser jogada uma excecao pelo "Message(byte[])"
 								   //BadMessagesQueue.Enqueue();
 								   //BadMessageReceived?.Invoke(this, new EventArgs());
-				} catch(Exception) {
+				} catch(Exception e) {
 
 				}
 			}else {
