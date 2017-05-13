@@ -18,7 +18,7 @@ namespace ModBus {
 			message.Add(mType);
 			message.AddRange(body);
 			byte[] crc = Crc.Calculate(message);    //Criar algoritimo do crc
-			//message.AddRange(crc);
+													//message.AddRange(crc);
 			message.Add(crc[1]);    //CRC LO
 			message.Add(crc[0]);    //CRC HI
 
@@ -30,13 +30,13 @@ namespace ModBus {
 			message.Add(mType);
 			message.AddRange(body);
 			byte[] crc = Crc.Calculate(message);    //Testar algoritimo do crc
-//			message.AddRange(crc);
-			message.Add(crc[1]);	//CRC LO
-			message.Add(crc[0]);	//CRC HI
+													//			message.AddRange(crc);
+			message.Add(crc[1]);    //CRC LO
+			message.Add(crc[0]);    //CRC HI
 		}
 
 		public Message(byte[] all) {
-			message.AddRange(all);	//ver se funciona como ponteiro
+			message.AddRange(all);  //ver se funciona como ponteiro
 			if(!CheckCrc())
 				throw new CrcError("CRC diferente");
 		}
@@ -56,12 +56,12 @@ namespace ModBus {
 			return message[1];
 		}
 		public List<byte> GetBody() {
-			return message.GetRange(2, message.Count-4);	// sem dispositovo, tipo e CRC
+			return message.GetRange(2, message.Count-4);    // sem dispositovo, tipo e CRC
 		}
 
 		public bool CheckCrc() {
 			byte[] crc = Crc.Calculate(message.GetRange(0, message.Count-2));
-			if(crc[1]==message[message.Count-2] && crc[0]==message[message.Count-1])    //Criar algoritimo do crc
+			if(crc[1]==message[message.Count-2]&&crc[0]==message[message.Count-1])    //Criar algoritimo do crc
 				return true;
 			return false;
 		}
@@ -79,10 +79,10 @@ namespace ModBus {
 			byte[] num = BitConverter.GetBytes(nCoils);
 			byte[] body = new byte[4];
 			body[0]=fisrt[1];   //startingAddress HI
-			body[1]=fisrt[0];	//startingAddress LO
+			body[1]=fisrt[0];   //startingAddress LO
 			body[2]=num[1];     //nCoils		  HI
 			body[3]=num[0];     //nCoils		  LO
-			//</metodo 1>
+								//</metodo 1>
 
 			//<metodo 2>
 			/*List<byte> b = new List<byte>();		//outra maneira
@@ -101,8 +101,8 @@ namespace ModBus {
 			byte[] fisrt = BitConverter.GetBytes(startingAddress);
 			byte[] num = BitConverter.GetBytes(nInputs);
 			byte[] body = new byte[4];
-			body[0]=fisrt[1];	//startingAddress HI
-			body[1]=fisrt[0];	//startingAddress LO
+			body[0]=fisrt[1];   //startingAddress HI
+			body[1]=fisrt[0];   //startingAddress LO
 			body[2]=num[1];     //nInputs		  HI
 			body[3]=num[0];     //nInputs		  LO
 
@@ -118,7 +118,7 @@ namespace ModBus {
 			byte[] body = new byte[4];
 			body[0]=fisrt[1];   //startingAddress HI
 			body[1]=fisrt[0];   //startingAddress LO
-			body[2]=0;			//ever 0
+			body[2]=0;          //ever 0
 			body[3]=num[0];     //nRegisters	  LO
 
 			return new Message(dispositivo, (byte)MessageType.ReadNHoldingRegisters, body);
@@ -130,8 +130,8 @@ namespace ModBus {
 			byte[] body = new byte[4];
 			body[0]=fisrt[1];   //CoilAddress	HI
 			body[1]=fisrt[0];   //CoilAddress	LO
-			body[2]=(byte)(coilValue?256:0);	//value
-			body[3]=0;							//ever 0
+			body[2]=(byte)( coilValue ? 256 : 0 );  //value
+			body[3]=0;                          //ever 0
 			return new Message(dispositivo, (byte)MessageType.WriteSigleCoil, body);
 		}
 
@@ -151,7 +151,7 @@ namespace ModBus {
 		static public Message WriteNCoils(byte dispositivo, ushort startingAddress, List<bool> values) {
 			ushort nCoils = (ushort)values.Count;
 			if(nCoils>2000) throw new BadMessage("More than 2000 Inputs"); ;   //limite do protocolo
-			
+
 			byte N = (byte)(nCoils/8);
 			if(nCoils%8!=0) N++;
 
@@ -167,7 +167,7 @@ namespace ModBus {
 			for(byte i = 0; i<N; i++) {
 				int j = i*8;
 				int aux = 0;
-				for(int k=0; k<8 && j+k <nCoils; k++) {
+				for(int k = 0; k<8&&j+k<nCoils; k++) {
 					if(values[j+k]) aux+=2^k;
 				}
 				body[5+i]=(byte)aux;
@@ -188,11 +188,11 @@ namespace ModBus {
 			body[1]=fisrt[0];
 			body[2]=num[1];
 			body[3]=num[0];
-			body[4]=(byte)nRegisters;
+			body[4]=(byte)( nRegisters*2 );
 
-			for(int i=0; i<nRegisters; i++) {
+			for(int i = 0; i<nRegisters; i++) {
 				byte[] aux = BitConverter.GetBytes(values[i]);
-				body[5+2*i]=aux[1];		//iezimo valor HI
+				body[5+2*i]=aux[1];     //iezimo valor HI
 				body[6+2*i]=aux[0];     //iezimo valor LO
 			}
 
@@ -212,7 +212,7 @@ namespace ModBus {
 			body[1]=fisrt[0];
 			body[2]=num[1];
 			body[3]=num[0];
-			body[4]=(byte)nRegisters;
+			body[4]=(byte)( nRegisters*2 );
 
 			for(int i = 0; i<list.Length; i++) body[5+i]=list[i];
 

@@ -9,6 +9,21 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace ModBus {
+	public enum MemoryAdrress : byte {
+		Inputs = 0x00,
+		Coils = 0x10,
+		HoldingRegisters = 0x18,
+		Temp = 0x18,
+		SetPoint = 0x20,
+		Tm1 = 0x22,
+		Tm2 = 0x23,
+		Tm3 = 0x24,
+		Tm4 = 0x25,
+		IHM = 0x26,
+		IHM_l1 = 0x26,
+		IHM_l2 = 0x36
+	}
+
 	public partial class Form1 : Form {
 		ModBusPort modBusPort = new ModBusPort();
 		System.Timers.Timer refreshTimer = new System.Timers.Timer();
@@ -32,9 +47,9 @@ namespace ModBus {
 		static string[] stopBits = { "One", "Two" };    //see System.IO.Ports.StopBits	//None e OnePointFive nao suportados
 		static string[] parity = { "None", "Odd", "Even", "Mark", "Space" };    //see System.IO.Ports.Parity
 
-		static char[] teclas = { '1', '2', '3', 'A', '4', '5', '6', 'B', '7', '8', '9', 'C', '*', '0', '#' };
-		static byte[] IHMmessagel1 = new byte[16];
-		static byte[] IHMmessagel2 = new byte[16];
+		static char[] teclas = { '1', '2', '3', 'A', '4', '5', '6', 'B', '7', '8', '9', 'C', '*', '0', '#', 'D' };
+		static byte[] IHMmessage = new byte[32];
+		//static byte[] IHMmessagel2 = new byte[16];
 
 		bool refreshMotorTime = true;
 		bool refreshTemperature = true;
@@ -84,41 +99,26 @@ namespace ModBus {
 			tb_LDC_l1.TextChanged+=delegate { refreshLcdL1=true; };
 			tb_LDC_l2.TextChanged+=delegate { refreshLcdL2=true; };*/
 
-			IHMmessagel1[0]=(byte)'t';
-			IHMmessagel1[1]=(byte)'e';
-			IHMmessagel1[2]=(byte)'c';
-			IHMmessagel1[3]=(byte)'l';
-			IHMmessagel1[4]=(byte)'a';
-			IHMmessagel1[5]=(byte)' ';
-			for(int i=7; i<16; i++) IHMmessagel1[i]=(byte)' ';
+			IHMmessage[0]=(byte)'t';
+			IHMmessage[1]=(byte)'e';
+			IHMmessage[2]=(byte)'c';
+			IHMmessage[3]=(byte)'l';
+			IHMmessage[4]=(byte)'a';
+			IHMmessage[5]=(byte)' ';
+			for(int i=0x06; i<0x10; i++) IHMmessage[i]=(byte)' ';
 
-			IHMmessagel2[0]=(byte)'p';
-			IHMmessagel2[1]=(byte)'r';
-			IHMmessagel2[2]=(byte)'e';
-			IHMmessagel2[3]=(byte)'c';
-			IHMmessagel2[4]=(byte)'i';
-			IHMmessagel2[5]=(byte)'o';
-			IHMmessagel2[6]=(byte)'n';
-			IHMmessagel2[7]=(byte)'a';
-			IHMmessagel2[8]=(byte)'d';
-			IHMmessagel2[9]=(byte)'a';
-			for(int i = 10; i<16; i++) IHMmessagel1[i]=(byte)' ';
+			IHMmessage[0x10]=(byte)'p';
+			IHMmessage[0x11]=(byte)'r';
+			IHMmessage[0x12]=(byte)'e';
+			IHMmessage[0x13]=(byte)'c';
+			IHMmessage[0x14]=(byte)'i';
+			IHMmessage[0x15]=(byte)'o';
+			IHMmessage[0x16]=(byte)'n';
+			IHMmessage[0x17]=(byte)'a';
+			IHMmessage[0x18]=(byte)'d';
+			IHMmessage[0x19]=(byte)'a';
+			for(int i = 0x1A; i<0x20; i++) IHMmessage[i]=(byte)' ';
 		}
-
-		/*public void InterpretaMensagem() {
-			KeyValuePair<Message, Message> par;
-			par=modBusPort.LerMensagem();
-			if(par.Value.GetDevice()==(byte)e_devices.kl25) {
-				switch(par.Value.GetMessageType()) {
-					case (byte)mesages_num.read_cois:	//message 1
-						
-					break;
-					case (byte)Message.MessageType.broadcast:
-						//code here too;
-					break;
-				}
-			}
-		}*/
 
 		private void InterpretaMensagem(object sender, MessageReceivedEventArgs e) {
 			Message query = e.MessagePair.Key, answer = e.MessagePair.Value;
@@ -133,29 +133,43 @@ namespace ModBus {
 						//talez colocar o codigo de ligar e desligar os motores aqui, logo apos ler o estado atual deles
 						break;
 					case (byte)MessageType.ReadNInputs:
-						if(query.GetBody()[0]!=2 && query.GetBody().Count()!=3) return;       //só é feita leitura de 16 bits
-						byte b;
-						int i = 0;
-						b=query.GetBody()[2];
-						for(byte mask = 0x01; mask<=0x80; mask<<=1) {
-							if((b&mask)!=0){
-								IHMmessagel1[6]=(byte)teclas[i];
-								modBusPort.EscreverMensagem(Message.WriteNHoldingRegisters(1, 0x26, IHMmessagel1));
-								modBusPort.EscreverMensagem(Message.WriteNHoldingRegisters(1, 0x36, IHMmessagel2));
+						if(answer.GetBody()[0]!=2 && answer.GetBody().Count()!=3) return;       //só é feita leitura de 16 bits
+
+						//bool[] kbbits = new bool[16];
+						ushort kb = (ushort)(256*answer.GetBody()[1]+answer.GetBody()[2]);
+						byte c=0;
+						for(ushort mask = 0x8000; mask>0; mask>>=1, c++) {
+							if(( kb & mask) != 0) {
+								IHMmessage[6]=(byte)teclas[c];
+								modBusPort.EscreverMensagem(Message.WriteNHoldingRegisters(1, 0x26, IHMmessage));
+								Invoke(new EventHandler(AtualizaLcd));
 								return;
 							}
-							i++;
 						}
-						b=query.GetBody()[1];
+
+						/*byte b;
+						int c = 0;
+						b=answer.GetBody()[1];
 						for(byte mask = 0x01; mask<=0x80; mask<<=1) {
 							if((b&mask)!=0){
-								IHMmessagel1[6]=(byte)teclas[i];
-								modBusPort.EscreverMensagem(Message.WriteNHoldingRegisters(1, 0x26, IHMmessagel1));
-								modBusPort.EscreverMensagem(Message.WriteNHoldingRegisters(1, 0x36, IHMmessagel2));
+								IHMmessage[6]=(byte)teclas[c];
+
+								int j=c;
+
+								modBusPort.EscreverMensagem(Message.WriteNHoldingRegisters(1, 0x26, IHMmessage));
+//								modBusPort.EscreverMensagem(Message.WriteNHoldingRegisters(1, 0x36, IHMmessagel2));
 								return;
-							}
-							i++;
+							}else c++;
 						}
+						b=answer.GetBody()[2];
+						for(byte mask = 0x01; mask<=0x80; mask<<=1) {
+							if((b&mask)!=0){
+								IHMmessage[6]=(byte)teclas[c];
+								modBusPort.EscreverMensagem(Message.WriteNHoldingRegisters(1, 0x26, IHMmessage));
+//								modBusPort.EscreverMensagem(Message.WriteNHoldingRegisters(1, 0x36, IHMmessagel2));
+								return;
+							}else c++;
+						}*/
 						break;
 					/*case (byte)MessageType.WriteNHoldingRegisters:	//aqui nao precisa fazer nada	//drink a beer
 						switch(answer.GetBody()[1]) {	
@@ -166,9 +180,9 @@ namespace ModBus {
 						}
 						break;*/
 					case (byte)MessageType.ReadNHoldingRegisters:
-						List<byte> bv = query.GetBody();
+						List<byte> bv = answer.GetBody();
 						if(bv[0]!=4) return;                    //se for a leitura de mais de 2 HoldingRegisters (um float 32 bits)
-						if(answer.GetBody()[1]!=0x18) return;  // so é feita a leitura da temperatura	//adrress
+						if(query.GetBody()[1]!=(byte)MemoryAdrress.Temp) return;	// so é feita a leitura da temperatura	//adrress
 						if(bv.Count!=5) return;                 //verificar //2B para o numero de bytes e 4 para o float
 						byte[] temp = new byte[4];
 						temp[3]=bv[1];
@@ -194,6 +208,7 @@ namespace ModBus {
 				}
 			}
 		}
+
 		private void AtualizaTelaMotores(object sender, EventArgs e) {
 			byte b = B_motorState;
 			byte mask = 0x03;
@@ -217,6 +232,12 @@ namespace ModBus {
 		}
 		private void AtualizaTelaTemperatura(object sender, EventArgs e) {
 			tb_cur_tem.Text=temperatura.ToString();
+		}
+		private void AtualizaLcd(object sender, EventArgs e) {
+			tb_LDC_l1.Clear();
+			for(byte b = 0; b<16; b++) tb_LDC_l1.AppendText($"{IHMmessage[b]:x2}");
+			tb_LDC_l2.Clear();
+			for(byte b = 16; b<32; b++) tb_LDC_l2.AppendText($"{IHMmessage[b]:x2}");
 		}
 
 		private void InterpretaMensagemSemResposta(object sender, MessageTimeOutEventArgs e) {  //so para teste por enquanto

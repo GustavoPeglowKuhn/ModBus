@@ -71,15 +71,16 @@
 			this.label12 = new System.Windows.Forms.Label();
 			this.label16 = new System.Windows.Forms.Label();
 			this.btn_test = new System.Windows.Forms.Button();
-			this.label17 = new System.Windows.Forms.Label();
 			this.tb_LDC_l1 = new System.Windows.Forms.TextBox();
 			this.tb_LDC_l2 = new System.Windows.Forms.TextBox();
+			this.groupBox1 = new System.Windows.Forms.GroupBox();
 			this.menuStrip1.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.nud_dType)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.nud_m1)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.nud_m2)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.nud_m3)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.nud_m4)).BeginInit();
+			this.groupBox1.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// menuStrip1
@@ -565,39 +566,47 @@
 			this.btn_test.UseVisualStyleBackColor = true;
 			this.btn_test.Click += new System.EventHandler(this.btn_test_Click);
 			// 
-			// label17
-			// 
-			this.label17.AutoSize = true;
-			this.label17.Location = new System.Drawing.Point(278, 284);
-			this.label17.Name = "label17";
-			this.label17.Size = new System.Drawing.Size(54, 13);
-			this.label17.TabIndex = 48;
-			this.label17.Text = "LCD 16x2";
-			// 
 			// tb_LDC_l1
 			// 
-			this.tb_LDC_l1.Location = new System.Drawing.Point(329, 277);
+			this.tb_LDC_l1.BackColor = System.Drawing.Color.LimeGreen;
+			this.tb_LDC_l1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.tb_LDC_l1.Font = new System.Drawing.Font("Consolas", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.tb_LDC_l1.Location = new System.Drawing.Point(6, 9);
+			this.tb_LDC_l1.MaxLength = 16;
 			this.tb_LDC_l1.Name = "tb_LDC_l1";
-			this.tb_LDC_l1.Size = new System.Drawing.Size(119, 20);
+			this.tb_LDC_l1.Size = new System.Drawing.Size(117, 23);
 			this.tb_LDC_l1.TabIndex = 49;
 			this.tb_LDC_l1.Text = "Isso esta desligado";
 			// 
 			// tb_LDC_l2
 			// 
-			this.tb_LDC_l2.Location = new System.Drawing.Point(329, 294);
+			this.tb_LDC_l2.BackColor = System.Drawing.Color.LimeGreen;
+			this.tb_LDC_l2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.tb_LDC_l2.Font = new System.Drawing.Font("Consolas", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.tb_LDC_l2.Location = new System.Drawing.Point(6, 29);
+			this.tb_LDC_l2.MaxLength = 16;
 			this.tb_LDC_l2.Name = "tb_LDC_l2";
-			this.tb_LDC_l2.Size = new System.Drawing.Size(119, 20);
+			this.tb_LDC_l2.Size = new System.Drawing.Size(117, 23);
 			this.tb_LDC_l2.TabIndex = 50;
 			this.tb_LDC_l2.Text = "perguntar para ele";
+			// 
+			// groupBox1
+			// 
+			this.groupBox1.BackColor = System.Drawing.Color.Black;
+			this.groupBox1.Controls.Add(this.tb_LDC_l1);
+			this.groupBox1.Controls.Add(this.tb_LDC_l2);
+			this.groupBox1.Location = new System.Drawing.Point(345, 248);
+			this.groupBox1.Name = "groupBox1";
+			this.groupBox1.Size = new System.Drawing.Size(129, 59);
+			this.groupBox1.TabIndex = 51;
+			this.groupBox1.TabStop = false;
 			// 
 			// Form1
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(627, 352);
-			this.Controls.Add(this.tb_LDC_l2);
-			this.Controls.Add(this.tb_LDC_l1);
-			this.Controls.Add(this.label17);
+			this.Controls.Add(this.groupBox1);
 			this.Controls.Add(this.btn_test);
 			this.Controls.Add(this.tb_cur_tem);
 			this.Controls.Add(this.label12);
@@ -646,6 +655,8 @@
 			((System.ComponentModel.ISupportInitialize)(this.nud_m2)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.nud_m3)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.nud_m4)).EndInit();
+			this.groupBox1.ResumeLayout(false);
+			this.groupBox1.PerformLayout();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -700,9 +711,9 @@
 		private System.Windows.Forms.ToolStripMenuItem ms_sp_stopBits;
 		private System.Windows.Forms.ToolStripComboBox ms_sp_stop_combobox;
 		private System.Windows.Forms.Button btn_test;
-		private System.Windows.Forms.Label label17;
 		private System.Windows.Forms.TextBox tb_LDC_l1;
 		private System.Windows.Forms.TextBox tb_LDC_l2;
+		private System.Windows.Forms.GroupBox groupBox1;
 	}
 }
 
