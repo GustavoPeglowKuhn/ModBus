@@ -49,7 +49,6 @@ namespace ModBus {
 
 		static char[] teclas = { '1', '2', '3', 'A', '4', '5', '6', 'B', '7', '8', '9', 'C', '*', '0', '#', 'D' };
 		static byte[] IHMmessage = new byte[32];
-		static byte[] IHMmessage2 = new byte[32];
 		int n=0;
 
 		bool refreshMotorTime = true;
@@ -141,18 +140,25 @@ namespace ModBus {
 						//bool[] kbbits = new bool[16];
 						ushort kb = (ushort)(256*answer.GetBody()[1]+answer.GetBody()[2]);
 						byte c=0;
+						List<ushort> mes = new List<ushort>();
 						for(ushort mask = 0x8000; mask>0; mask>>=1, c++) {
 							if(( kb & mask) != 0) {
 								//IHMmessage[6]=(byte)teclas[c];
 								IHMmessage=makeMessage("tecla "+teclas[c], "precionada");
-								modBusPort.EscreverMensagem(Message.WriteNHoldingRegisters(1, 0x26, IHMmessage));
+								
+								foreach(byte b in IHMmessage) mes.Add((ushort)b);
+								modBusPort.EscreverMensagem(Message.WriteNHoldingRegisters(1, 0x26, mes));
+								//modBusPort.EscreverMensagem(Message.WriteNHoldingRegisters(1, 0x26, IHMmessage));
 								Invoke(new EventHandler(AtualizaLcd));
+								n=0;
 								return;
 							}
 						}
 
 						IHMmessage=makeMessage(""+(++n), "atualizacoes");
-						modBusPort.EscreverMensagem(Message.WriteNHoldingRegisters(1, 0x26, IHMmessage));
+						foreach(byte b in IHMmessage) mes.Add((ushort)b);
+						modBusPort.EscreverMensagem(Message.WriteNHoldingRegisters(1, 0x26, mes));
+						//modBusPort.EscreverMensagem(Message.WriteNHoldingRegisters(1, 0x26, IHMmessage));
 						Invoke(new EventHandler(AtualizaLcd));
 						
 						/*byte b;

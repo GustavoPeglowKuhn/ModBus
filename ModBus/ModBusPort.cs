@@ -149,6 +149,7 @@ namespace ModBus {
 		//     System.IO.Ports.SerialPort.
 		private void SendMesssage() {
 			//if(waitingMessage)			throw new ModBusException("busy");
+			if(!IsOpen) return;			//ModBusPort id close
 			if(waitingMessage) return;  //ModBusPort is busy now
 			//if(tmr_TimeOut.Enabled) return;  //ModBusPort is busy now		//melhor usar waitingMessage pois ela só é trocada para false depois de limpar os buffers
 			if(writeBuffer.Count==0) return;	//Nothing to write
@@ -175,13 +176,12 @@ namespace ModBus {
 				} catch(CrcError) {//pode ser jogada uma excecao pelo "Message(byte[])"
 								   //BadMessagesQueue.Enqueue();
 								   //BadMessageReceived?.Invoke(this, new EventArgs());
-				} catch(Exception e) {
+				} catch(Exception) {
 
 				}
 			}else {
 				writeBuffer.Dequeue();	//remove a mensagem que foi respondida corretamente
 										//pode ser colocado um flag na classe message para indicar se ela deve ser enviada novemente para o servo
-
 				//pode ser disparado um evento para indicar o erro
 			}
 			buffer.Clear();
