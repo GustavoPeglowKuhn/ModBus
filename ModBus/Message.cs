@@ -72,7 +72,7 @@ namespace ModBus {
 
 		/*Message 1 - Read n coils from slave*/
 		static public Message ReadNCoils(byte dispositivo, ushort startingAddress, ushort nCoils) {
-			if(nCoils>2000) throw new BadMessage("More than 2000 Coins");   //limite do protocolo
+			if(nCoils>2000) throw new BadMessageException("More than 2000 Coins");   //limite do protocolo
 
 			//<metodo 1>
 			byte[] fisrt = BitConverter.GetBytes(startingAddress);
@@ -96,7 +96,7 @@ namespace ModBus {
 
 		/*Message 2 - Read n inputs from slave*/
 		static public Message ReadNInputs(byte dispositivo, ushort startingAddress, ushort nInputs) {    //envia a mensagem 1
-			if(nInputs>2000) throw new BadMessage("More than 2000 Inputs"); ;   //limite do protocolo
+			if(nInputs>2000) throw new BadMessageException("More than 2000 Inputs"); ;   //limite do protocolo
 
 			byte[] fisrt = BitConverter.GetBytes(startingAddress);
 			byte[] num = BitConverter.GetBytes(nInputs);
@@ -111,7 +111,7 @@ namespace ModBus {
 
 		/*Message 3 - Read n Holding Registers from slave*/
 		static public Message ReadNHoldingRegisters(byte dispositivo, ushort startingAddress, ushort nRegisters) {    //envia a mensagem 1
-			if(nRegisters>125) throw new BadMessage("More than 125 Registers");   //limite do protocolo, exede o tamanho do frame
+			if(nRegisters>125) throw new BadMessageException("More than 125 Registers");   //limite do protocolo, exede o tamanho do frame
 
 			byte[] fisrt = BitConverter.GetBytes(startingAddress);
 			byte[] num = BitConverter.GetBytes(nRegisters);
@@ -150,7 +150,7 @@ namespace ModBus {
 		/*Message 15 - Write n coils*/ //o numero de bobinas é o tamanho da lista values
 		static public Message WriteNCoils(byte dispositivo, ushort startingAddress, List<bool> values) {
 			ushort nCoils = (ushort)values.Count;
-			if(nCoils>2000) throw new BadMessage("More than 2000 Inputs"); ;   //limite do protocolo
+			if(nCoils>2000) throw new BadMessageException("More than 2000 Inputs"); ;   //limite do protocolo
 
 			byte N = (byte)(nCoils/8);
 			if(nCoils%8!=0) N++;
@@ -179,7 +179,7 @@ namespace ModBus {
 		/*Message 16 - Write n coils*/ //o numero de Holding Registers é o tamanho da lista values
 		static public Message WriteNHoldingRegisters(byte dispositivo, ushort startingAddress, List<ushort> values) {
 			ushort nRegisters = (ushort)values.Count;
-			if(nRegisters>120) throw new BadMessage("More than 120 Registers"); ;   //limite do protocolo
+			if(nRegisters>120) throw new BadMessageException("More than 120 Registers"); ;   //limite do protocolo
 
 			byte[] fisrt = BitConverter.GetBytes(startingAddress);
 			byte[] num = BitConverter.GetBytes(nRegisters);
@@ -203,7 +203,7 @@ namespace ModBus {
 		//list deve conter o mais significavo com indice 0, por exemplo {0x12, 0x34, 0xab, 0xcd} sera enviado 0x1234 para startingAddress e 0xabcd para startingAddress+1
 		static public Message WriteNHoldingRegisters(byte dispositivo, ushort startingAddress, byte[] list) {
 			ushort nRegisters = (ushort)(list.Length/2);    //cada HoldingRegisters e de 16 bits
-			if(nRegisters>120) throw new BadMessage("More than 120 Registers"); ;   //limite do protocolo
+			if(nRegisters>120) throw new BadMessageException("More than 120 Registers"); ;   //limite do protocolo
 
 			byte[] fisrt = BitConverter.GetBytes(startingAddress);
 			byte[] num = BitConverter.GetBytes(nRegisters);
@@ -219,14 +219,21 @@ namespace ModBus {
 			return new Message(dispositivo, (byte)MessageType.WriteNHoldingRegisters, body);
 		}
 	}
-	class BadMessage : Exception {
-		public BadMessage() {
+
+	class InvelidMessage : List<byte> {
+		public InvelidMessage(byte[] message) {
+			AddRange(message);
+		}
+	}
+
+	class BadMessageException : Exception {
+		public BadMessageException() {
 		}
 
-		public BadMessage(string message) : base(message) {
+		public BadMessageException(string message) : base(message) {
 		}
 
-		public BadMessage(string message, Exception inner) : base(message, inner) {
+		public BadMessageException(string message, Exception inner) : base(message, inner) {
 		}
 	}
 }

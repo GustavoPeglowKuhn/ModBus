@@ -49,7 +49,8 @@ namespace ModBus {
 
 		static char[] teclas = { '1', '2', '3', 'A', '4', '5', '6', 'B', '7', '8', '9', 'C', '*', '0', '#', 'D' };
 		static byte[] IHMmessage = new byte[32];
-		//static byte[] IHMmessagel2 = new byte[16];
+		static byte[] IHMmessage2 = new byte[32];
+		int n=0;
 
 		bool refreshMotorTime = true;
 		bool refreshTemperature = true;
@@ -73,7 +74,9 @@ namespace ModBus {
 			nud_m2.ValueChanged+=delegate { refreshMotorTime=true; };
 			nud_m3.ValueChanged+=delegate { refreshMotorTime=true; };
 			nud_m4.ValueChanged+=delegate { refreshMotorTime=true; };
-			tb_set_tem.TextChanged+=delegate { refreshTemperature=true; };
+			tb_set_tem.TextChanged+=delegate {
+				refreshTemperature=true;
+			};
 
 			btn_m1_on.Click+=delegate { motorUserComand[0]=true; };
 			btn_m2_on.Click+=delegate { motorUserComand[1]=true; };
@@ -140,13 +143,18 @@ namespace ModBus {
 						byte c=0;
 						for(ushort mask = 0x8000; mask>0; mask>>=1, c++) {
 							if(( kb & mask) != 0) {
-								IHMmessage[6]=(byte)teclas[c];
+								//IHMmessage[6]=(byte)teclas[c];
+								IHMmessage=makeMessage("tecla "+teclas[c], "precionada");
 								modBusPort.EscreverMensagem(Message.WriteNHoldingRegisters(1, 0x26, IHMmessage));
 								Invoke(new EventHandler(AtualizaLcd));
 								return;
 							}
 						}
 
+						IHMmessage=makeMessage(""+(++n), "atualizacoes");
+						modBusPort.EscreverMensagem(Message.WriteNHoldingRegisters(1, 0x26, IHMmessage));
+						Invoke(new EventHandler(AtualizaLcd));
+						
 						/*byte b;
 						int c = 0;
 						b=answer.GetBody()[1];
@@ -209,6 +217,15 @@ namespace ModBus {
 			}
 		}
 
+		byte[] makeMessage(string l1, string l2) {
+			byte[] mes = new byte[32];
+			for(int i = 0; i<l1.Length; i++) mes[i]=(byte)l1[i];
+			for(int i = l1.Length; i<16; i++) mes[i]=(byte)' ';
+			for(int i = 0; i<l2.Length; i++) mes[i+16]=(byte)l2[i];
+			for(int i = l2.Length; i<16; i++) mes[i+16]=(byte)' ';
+			return mes;
+		}
+
 		private void AtualizaTelaMotores(object sender, EventArgs e) {
 			byte b = B_motorState;
 			byte mask = 0x03;
@@ -235,9 +252,9 @@ namespace ModBus {
 		}
 		private void AtualizaLcd(object sender, EventArgs e) {
 			tb_LDC_l1.Clear();
-			for(byte b = 0; b<16; b++) tb_LDC_l1.AppendText($"{IHMmessage[b]:x2}");
+			for(byte b = 0; b<16; b++) tb_LDC_l1.AppendText( ""+(char)IHMmessage[b] );// ($"{IHMmessage[b]:x2}");
 			tb_LDC_l2.Clear();
-			for(byte b = 16; b<32; b++) tb_LDC_l2.AppendText($"{IHMmessage[b]:x2}");
+			for(byte b = 16; b<32; b++) tb_LDC_l2.AppendText(""+(char)IHMmessage[b] );// ($"{IHMmessage[b]:x2}");
 		}
 
 		private void InterpretaMensagemSemResposta(object sender, MessageTimeOutEventArgs e) {  //so para teste por enquanto
@@ -249,9 +266,9 @@ namespace ModBus {
 			if(refreshMotorTime) { //write in 4 hold register
 				List<ushort> temp = new List<ushort>();
 				temp.Add((ushort)nud_m1.Value);
-				temp.Add((ushort)nud_m1.Value);
-				temp.Add((ushort)nud_m1.Value);
-				temp.Add((ushort)nud_m1.Value);
+				temp.Add((ushort)nud_m2.Value);
+				temp.Add((ushort)nud_m3.Value);
+				temp.Add((ushort)nud_m4.Value);
 				modBusPort.EscreverMensagem(Message.WriteNHoldingRegisters(1, 0x22, temp));
 				refreshMotorTime=false;
 			}
@@ -260,7 +277,7 @@ namespace ModBus {
 					float ftemp = float.Parse(tb_set_tem.Text.ToString());
 					byte[] vec = BitConverter.GetBytes(ftemp);
 					Array.Reverse(vec);
-					modBusPort.EscreverMensagem(Message.WriteNHoldingRegisters(1, 0x20, vec));
+					modBusPort.EscreverMensagem(Message.WriteNHoldingRegisters(1, (int)MemoryAdrress.SetPoint, vec));
 					/*List<ushort> list = new List<ushort>();
 					byte[] vec = BitConverter.GetBytes(ftemp);
 					list.Add((ushort)(vec[1]*256+vec[0]));
@@ -272,8 +289,8 @@ namespace ModBus {
 				refreshTemperature=false;
 			}
 			modBusPort.EscreverMensagem(Message.ReadNHoldingRegisters(1, 0x18, 2));		//le a temperatura do lm35
-			modBusPort.EscreverMensagem(Message.ReadNInputs(1, 0x00, 16));				//le o teclado
-			modBusPort.EscreverMensagem(Message.ReadNCoils(1, 0x10, 8));				//le o estado dos motores
+			modBusPort.EscreverMensagem(Message.ReadNInputs(1, 0x00, 16));              //le o teclado
+			//modBusPort.EscreverMensagem(Message.ReadNCoils(1, 0x10, 8));				//le o estado dos motores
 
 			//talvez torcar a parte de ligar e desligar para a funcao InterpretaMensagem,
 			//depois de receber a resposta do estado dos motores, dai só troca os motores que realmente precisa trocar
@@ -347,9 +364,7 @@ namespace ModBus {
 			/*	Essa funcao e chamada toda ves que o usuario abre a porta serial		*/
 			try {
 				modBusPort.Open();
-				//refreshTimer.Enabled=true;
-				//serialPort.Open();
-				//timer1.Enabled=true;
+				refreshTimer.Enabled=true;
 				ms_sp_conect.Enabled=false;
 				ms_sp_disconect.Enabled=true;
 			} catch(Exception) {
@@ -361,9 +376,6 @@ namespace ModBus {
 			/*	Essa funcao e chamada toda ves que o usuario fecha a porta serial		*/
 			try {
 				modBusPort.Close();
-				refreshTimer.Enabled=false;
-				//serialPort.Close();
-				//timer1.Enabled=false;
 				ms_sp_conect.Enabled=true;
 				ms_sp_disconect.Enabled=false;
 			} catch(Exception) {
@@ -401,9 +413,9 @@ namespace ModBus {
 
 		private void btn_test_Click(object sender, EventArgs e) {   //so para teste
 			try {
-				modBusPort.EscreverMensagem(Message.ReadNHoldingRegisters(1, 0x18, 2));	//temperatura
+				//modBusPort.EscreverMensagem(Message.ReadNHoldingRegisters(1, 0x18, 2));	//temperatura
 				//modBusPort.EscreverMensagem(Message.ReadNCoils(1, 0x00, 8));				//8leds
-				//modBusPort.EscreverMensagem(Message.ReadNInputs(1, 0x00, 16));              //le o teclado
+				modBusPort.EscreverMensagem(Message.ReadNInputs(1, 0x00, 16));              //le o teclado
 			} catch(Exception) { }
 		}
 		

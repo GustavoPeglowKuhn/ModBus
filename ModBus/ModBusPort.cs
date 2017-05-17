@@ -81,8 +81,10 @@ namespace ModBus {
 				//TimeOutQueue.Enqueue(writeBuffer.Dequeue());
 				//if(TimeOutQueue.Count>TimeOutQueueMaxSize)	TimeOutQueue.Dequeue();
 				//MessageTimeOut?.Invoke(this, new EventArgs());
-				Message mes = writeBuffer.Dequeue();    //para tirar a mensagem da fila, mesmo que MessageTimeOut nao seja invocado
-				MessageTimeOut?.Invoke(this, new MessageTimeOutEventArgs(mes));
+				try {
+					Message mes = writeBuffer.Dequeue();    //para tirar a mensagem da fila, mesmo que MessageTimeOut nao seja invocado
+					MessageTimeOut?.Invoke(this, new MessageTimeOutEventArgs(mes));
+				} catch(Exception) { }
 				buffer.Clear();
 				waitingMessage=false;
 				//if(writeBuffer.Count>0) //se tiver mensagem para ser enviada ja envia
