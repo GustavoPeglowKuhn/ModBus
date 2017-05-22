@@ -9,19 +9,20 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace ModBus {
-	public enum MemoryAdrress : byte {
-		Inputs = 0x00,
-		Coils = 0x10,
-		HoldingRegisters = 0x18,
-		Temp = 0x18,
-		SetPoint = 0x20,
-		Tm1 = 0x22,
-		Tm2 = 0x23,
-		Tm3 = 0x24,
-		Tm4 = 0x25,
-		IHM = 0x26,
-		IHM_l1 = 0x26,
-		IHM_l2 = 0x36
+	public enum MemoryAddress : byte {
+		Inputs				= 0x00,
+		Coils				= 0x10,
+		HoldingRegisters	= 0x18,
+		Temp				= 0x18,
+		SetPoint			= 0x20,
+		Tms					= 0x22,
+		Tm1					= 0x22,
+		Tm2					= 0x23,
+		Tm3					= 0x24,
+		Tm4					= 0x25,
+		IHM					= 0x26,
+		IHM_l1				= 0x26,
+		IHM_l2				= 0x36
 	}
 
 	public partial class Form1 : Form {
@@ -129,23 +130,23 @@ namespace ModBus {
 				switch(query.GetMessageType()) {
 					case (byte)MessageType.ReadNCoils:   //message 1
 														 //byte 0:	*N = Quantity of Outputs / 8, if the remainder is different of 0 ⇒ N = N+1
-						if(query.GetBody()[0]!=1) return;		//só é feita leitura de 8 bits
-						B_motorState=query.GetBody()[1];		//contem a resposta dos 8 bits
+						if(query.GetBody()[0]!=1) return;       //só é feita leitura de 8 bits
+						B_motorState=query.GetBody()[1];        //contem a resposta dos 8 bits
 						Invoke(new EventHandler(AtualizaTelaMotores));
 						//talez colocar o codigo de ligar e desligar os motores aqui, logo apos ler o estado atual deles
 						break;
 					case (byte)MessageType.ReadNInputs:
-						if(answer.GetBody()[0]!=2 && answer.GetBody().Count()!=3) return;       //só é feita leitura de 16 bits
+						if(answer.GetBody()[0]!=2&&answer.GetBody().Count()!=3) return;       //só é feita leitura de 16 bits
 
 						//bool[] kbbits = new bool[16];
 						ushort kb = (ushort)(256*answer.GetBody()[1]+answer.GetBody()[2]);
 						byte c=0;
 						List<ushort> mes = new List<ushort>();
 						for(ushort mask = 0x8000; mask>0; mask>>=1, c++) {
-							if(( kb & mask) != 0) {
+							if(( kb&mask )!=0) {
 								//IHMmessage[6]=(byte)teclas[c];
 								IHMmessage=makeMessage("tecla "+teclas[c], "precionada");
-								
+
 								foreach(byte b in IHMmessage) mes.Add((ushort)b);
 								modBusPort.EscreverMensagem(Message.WriteNHoldingRegisters(1, 0x26, mes));
 								//modBusPort.EscreverMensagem(Message.WriteNHoldingRegisters(1, 0x26, IHMmessage));
@@ -155,12 +156,12 @@ namespace ModBus {
 							}
 						}
 
-						IHMmessage=makeMessage(""+(++n), "atualizacoes");
+						IHMmessage=makeMessage(""+( ++n ), "atualizacoes");
 						foreach(byte b in IHMmessage) mes.Add((ushort)b);
 						modBusPort.EscreverMensagem(Message.WriteNHoldingRegisters(1, 0x26, mes));
 						//modBusPort.EscreverMensagem(Message.WriteNHoldingRegisters(1, 0x26, IHMmessage));
 						Invoke(new EventHandler(AtualizaLcd));
-						
+
 						/*byte b;
 						int c = 0;
 						b=answer.GetBody()[1];
@@ -195,16 +196,22 @@ namespace ModBus {
 						break;*/
 					case (byte)MessageType.ReadNHoldingRegisters:
 						List<byte> bv = answer.GetBody();
-						if(bv[0]!=4) return;                    //se for a leitura de mais de 2 HoldingRegisters (um float 32 bits)
-						if(query.GetBody()[1]!=(byte)MemoryAdrress.Temp) return;	// so é feita a leitura da temperatura	//adrress
-						if(bv.Count!=5) return;                 //verificar //2B para o numero de bytes e 4 para o float
-						byte[] temp = new byte[4];
-						temp[3]=bv[1];
-						temp[2]=bv[2];
-						temp[1]=bv[3];
-						temp[0]=bv[4];
-						temperatura=BitConverter.ToSingle(temp, 0);
-						Invoke(new EventHandler(AtualizaTelaTemperatura));
+						//if(bv[0]!=4) return;                    //se for a leitura de mais de 2 HoldingRegisters (um float 32 bits)
+						if(query.GetBody()[1]==(byte)MemoryAddress.Temp) {  // leitura da temperatura	//adrress
+							if(bv.Count!=5) return;                 //verificar //1 para o numero de bytes e 4 para o float
+							if(bv[0]!=4) return;					//byte count
+							try {
+								byte[] temp = new byte[4];
+								temp[3]=bv[1];
+								temp[2]=bv[2];
+								temp[1]=bv[3];
+								temp[0]=bv[4];
+								temperatura=BitConverter.ToSingle(temp, 0);
+								Invoke(new EventHandler(AtualizaTelaTemperatura));
+							} catch(Exception) { }
+						}
+						//if(query.GetBody()[1]==(byte)MemoryAddress.Tms){			////////////////////////////////////////////////////////////////////
+						//}
 						break;
 					//testar o enio antes de habilitar a funcoes de erro
 					/*case 128+(byte)MessageType.ReadNCoils:	//erro
@@ -283,7 +290,7 @@ namespace ModBus {
 					float ftemp = float.Parse(tb_set_tem.Text.ToString());
 					byte[] vec = BitConverter.GetBytes(ftemp);
 					Array.Reverse(vec);
-					modBusPort.EscreverMensagem(Message.WriteNHoldingRegisters(1, (int)MemoryAdrress.SetPoint, vec));
+					modBusPort.EscreverMensagem(Message.WriteNHoldingRegisters(1, (int)MemoryAddress.SetPoint, vec));
 					/*List<ushort> list = new List<ushort>();
 					byte[] vec = BitConverter.GetBytes(ftemp);
 					list.Add((ushort)(vec[1]*256+vec[0]));
@@ -370,7 +377,7 @@ namespace ModBus {
 			/*	Essa funcao e chamada toda ves que o usuario abre a porta serial		*/
 			try {
 				modBusPort.Open();
-				refreshTimer.Enabled=true;
+				//refreshTimer.Enabled=true;
 				ms_sp_conect.Enabled=false;
 				ms_sp_disconect.Enabled=true;
 			} catch(Exception) {
@@ -419,9 +426,20 @@ namespace ModBus {
 
 		private void btn_test_Click(object sender, EventArgs e) {   //so para teste
 			try {
+				//modBusPort.EscreverMensagem(Message.ReadNHoldingRegisters(1, (ushort)MemoryAddress.Tms, 4));	//temperatura
 				//modBusPort.EscreverMensagem(Message.ReadNHoldingRegisters(1, 0x18, 2));	//temperatura
 				//modBusPort.EscreverMensagem(Message.ReadNCoils(1, 0x00, 8));				//8leds
-				modBusPort.EscreverMensagem(Message.ReadNInputs(1, 0x00, 16));              //le o teclado
+				//modBusPort.EscreverMensagem(Message.ReadNInputs(1, 0x00, 16));			//le o teclado
+
+				//float ftemp = float.Parse(tb_set_tem.Text.ToString());
+				//byte[] vec = BitConverter.GetBytes(ftemp);
+				//Array.Reverse(vec);
+				//modBusPort.EscreverMensagem(Message.WriteNHoldingRegisters(1, (int)MemoryAdrress.SetPoint, vec));
+
+				bool[] coils = {false, false, true, true, false, false};
+				List<bool> Coils = new List<bool>();
+				Coils.AddRange(coils);
+				modBusPort.EscreverMensagem(Message.WriteNCoils(1, (ushort)MemoryAddress.Coils, Coils));
 			} catch(Exception) { }
 		}
 		
