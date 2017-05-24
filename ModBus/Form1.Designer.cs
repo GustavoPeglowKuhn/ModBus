@@ -40,7 +40,6 @@
 			this.nud_dType = new System.Windows.Forms.NumericUpDown();
 			this.lbl_temp = new System.Windows.Forms.Label();
 			this.label3 = new System.Windows.Forms.Label();
-			this.tb_set_tem = new System.Windows.Forms.TextBox();
 			this.label2 = new System.Windows.Forms.Label();
 			this.nud_m1 = new System.Windows.Forms.NumericUpDown();
 			this.label4 = new System.Windows.Forms.Label();
@@ -74,6 +73,8 @@
 			this.tb_LDC_l1 = new System.Windows.Forms.TextBox();
 			this.tb_LDC_l2 = new System.Windows.Forms.TextBox();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
+			this.nud_setTemp = new System.Windows.Forms.NumericUpDown();
+			this.button1 = new System.Windows.Forms.Button();
 			this.menuStrip1.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.nud_dType)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.nud_m1)).BeginInit();
@@ -81,6 +82,7 @@
 			((System.ComponentModel.ISupportInitialize)(this.nud_m3)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.nud_m4)).BeginInit();
 			this.groupBox1.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.nud_setTemp)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// menuStrip1
@@ -236,14 +238,6 @@
 			this.label3.TabIndex = 14;
 			this.label3.Text = "°C";
 			// 
-			// tb_set_tem
-			// 
-			this.tb_set_tem.Location = new System.Drawing.Point(174, 179);
-			this.tb_set_tem.Name = "tb_set_tem";
-			this.tb_set_tem.Size = new System.Drawing.Size(54, 20);
-			this.tb_set_tem.TabIndex = 15;
-			this.tb_set_tem.Text = "35";
-			// 
 			// label2
 			// 
 			this.label2.AutoSize = true;
@@ -256,6 +250,11 @@
 			// 
 			// nud_m1
 			// 
+			this.nud_m1.Increment = new decimal(new int[] {
+            50,
+            0,
+            0,
+            0});
 			this.nud_m1.Location = new System.Drawing.Point(98, 75);
 			this.nud_m1.Maximum = new decimal(new int[] {
             65535,
@@ -266,7 +265,7 @@
 			this.nud_m1.Size = new System.Drawing.Size(81, 20);
 			this.nud_m1.TabIndex = 17;
 			this.nud_m1.Value = new decimal(new int[] {
-            50,
+            2500,
             0,
             0,
             0});
@@ -293,6 +292,11 @@
 			// 
 			// nud_m2
 			// 
+			this.nud_m2.Increment = new decimal(new int[] {
+            50,
+            0,
+            0,
+            0});
 			this.nud_m2.Location = new System.Drawing.Point(98, 101);
 			this.nud_m2.Maximum = new decimal(new int[] {
             65535,
@@ -303,7 +307,7 @@
 			this.nud_m2.Size = new System.Drawing.Size(81, 20);
 			this.nud_m2.TabIndex = 20;
 			this.nud_m2.Value = new decimal(new int[] {
-            50,
+            2500,
             0,
             0,
             0});
@@ -330,6 +334,11 @@
 			// 
 			// nud_m3
 			// 
+			this.nud_m3.Increment = new decimal(new int[] {
+            50,
+            0,
+            0,
+            0});
 			this.nud_m3.Location = new System.Drawing.Point(98, 127);
 			this.nud_m3.Maximum = new decimal(new int[] {
             65535,
@@ -340,7 +349,7 @@
 			this.nud_m3.Size = new System.Drawing.Size(81, 20);
 			this.nud_m3.TabIndex = 23;
 			this.nud_m3.Value = new decimal(new int[] {
-            50,
+            2500,
             0,
             0,
             0});
@@ -367,6 +376,11 @@
 			// 
 			// nud_m4
 			// 
+			this.nud_m4.Increment = new decimal(new int[] {
+            50,
+            0,
+            0,
+            0});
 			this.nud_m4.Location = new System.Drawing.Point(98, 153);
 			this.nud_m4.Maximum = new decimal(new int[] {
             65535,
@@ -377,7 +391,7 @@
 			this.nud_m4.Size = new System.Drawing.Size(81, 20);
 			this.nud_m4.TabIndex = 26;
 			this.nud_m4.Value = new decimal(new int[] {
-            50,
+            2500,
             0,
             0,
             0});
@@ -601,11 +615,51 @@
 			this.groupBox1.TabIndex = 51;
 			this.groupBox1.TabStop = false;
 			// 
+			// nud_setTemp
+			// 
+			this.nud_setTemp.DecimalPlaces = 2;
+			this.nud_setTemp.Increment = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+			this.nud_setTemp.Location = new System.Drawing.Point(174, 180);
+			this.nud_setTemp.Maximum = new decimal(new int[] {
+            150,
+            0,
+            0,
+            0});
+			this.nud_setTemp.Minimum = new decimal(new int[] {
+            50,
+            0,
+            0,
+            -2147483648});
+			this.nud_setTemp.Name = "nud_setTemp";
+			this.nud_setTemp.Size = new System.Drawing.Size(54, 20);
+			this.nud_setTemp.TabIndex = 52;
+			this.nud_setTemp.Value = new decimal(new int[] {
+            3512,
+            0,
+            0,
+            131072});
+			// 
+			// button1
+			// 
+			this.button1.Location = new System.Drawing.Point(33, 313);
+			this.button1.Name = "button1";
+			this.button1.Size = new System.Drawing.Size(195, 23);
+			this.button1.TabIndex = 53;
+			this.button1.Text = "teste2";
+			this.button1.UseVisualStyleBackColor = true;
+			this.button1.Click += new System.EventHandler(this.button1_Click);
+			// 
 			// Form1
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(627, 352);
+			this.Controls.Add(this.button1);
+			this.Controls.Add(this.nud_setTemp);
 			this.Controls.Add(this.groupBox1);
 			this.Controls.Add(this.btn_test);
 			this.Controls.Add(this.tb_cur_tem);
@@ -637,7 +691,6 @@
 			this.Controls.Add(this.label4);
 			this.Controls.Add(this.nud_m1);
 			this.Controls.Add(this.label2);
-			this.Controls.Add(this.tb_set_tem);
 			this.Controls.Add(this.label3);
 			this.Controls.Add(this.lbl_temp);
 			this.Controls.Add(this.lbl_dType);
@@ -657,6 +710,7 @@
 			((System.ComponentModel.ISupportInitialize)(this.nud_m4)).EndInit();
 			this.groupBox1.ResumeLayout(false);
 			this.groupBox1.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)(this.nud_setTemp)).EndInit();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -676,7 +730,6 @@
         private System.Windows.Forms.NumericUpDown nud_dType;
         private System.Windows.Forms.Label lbl_temp;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.TextBox tb_set_tem;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.NumericUpDown nud_m1;
         private System.Windows.Forms.Label label4;
@@ -714,6 +767,8 @@
 		private System.Windows.Forms.TextBox tb_LDC_l1;
 		private System.Windows.Forms.TextBox tb_LDC_l2;
 		private System.Windows.Forms.GroupBox groupBox1;
+		private System.Windows.Forms.NumericUpDown nud_setTemp;
+		private System.Windows.Forms.Button button1;
 	}
 }
 

@@ -139,14 +139,12 @@ namespace ModBus {
 		}
 
 		/*Message 6 - Write a single Holding Registers*/
-		static public Message WriteSigleHoldingRegisters(byte dispositivo, ushort registerAddress, bool registerValue) {
-			byte[] fisrt = BitConverter.GetBytes(registerAddress);
-			byte[] value = BitConverter.GetBytes(registerValue);
+		static public Message WriteSigleHoldingRegisters(byte dispositivo, ushort registerAddress, ushort registerValue) {
 			byte[] body = new byte[4];
-			body[0]=fisrt[1];   //CoilAddress	HI
-			body[1]=fisrt[0];   //CoilAddress	LO
-			body[2]=value[1];   //registerValue HI
-			body[3]=value[0];   //registerValue LO
+			body[0]=(byte)( registerAddress>>8 );	//CoilAddress	HI
+			body[1]=(byte)( registerAddress );		//CoilAddress	LO
+			body[2]=(byte)( registerValue>>8 );		//registerValue HI
+			body[3]=(byte)( registerValue );		//registerValue LO
 			return new Message(dispositivo, (byte)MessageType.WriteSigleHoldingRegisters, body);
 		}
 
