@@ -34,12 +34,12 @@ namespace ModBus {
 		enum e_devices : byte { broadcast, kl25 };
 		static string[] devices = { "broadcast", "kl25" };
 
-		enum e_motorState : byte { desligado=0, estrela=1, triangulo=2 };
+		enum e_motorState : byte { desligado=0, estrela=0x02, triangulo=0x01 };       //estrela b10 e triangulo b01
 		byte[] motorState = { (byte)e_motorState.desligado, (byte)e_motorState.desligado, (byte)e_motorState.desligado, (byte)e_motorState.desligado };
 		string[] s_motorState = { "desligado", "estrela", "triangulo", "est e tri" };
 		bool[] motorUserComand = { false, false, false, false };
 		//byte B_motorState = 0x00;
-		bool[] CoilsState = { false, false, false, false , false, false, false, false };	//8-bits
+		//bool[] CoilsState = { false, false, false, false , false, false, false, false };	//8-bits
 
 		float temperatura;
 
@@ -78,41 +78,17 @@ namespace ModBus {
 			btn_m3_off.Click+=delegate { motorUserComand[2]=false; };
 
 			refreshTimer.Elapsed+=delegate { RefreshRegisters(); };
-			refreshTimer.Interval=750; //2,5s planejar esse tempo depois
-
-			//modBusPort.MessageReceived+=delegate { InterpretaMensagem(); }; //modBusPort.t.Elapsed+=delegate { InterpretaMensagem(); };
+			refreshTimer.Interval=750; //planejar esse tempo depois
+			
 			modBusPort.MessageReceived+=InterpretaMensagem;
 			modBusPort.MessageTimeOut+=InterpretaMensagemSemResposta;
 
 			lbl_status_m1.Text=s_motorState[0];
-			lbl_status_m2.Text=s_motorState[0];
-			lbl_status_m3.Text=s_motorState[0];
-			lbl_status_m4.Text=s_motorState[0];
+			lbl_status_m2.Text=s_motorState[1];
+			lbl_status_m3.Text=s_motorState[2];
+			lbl_status_m4.Text=s_motorState[3];
 
-/*			tb_LDC_l1.TextChanged+=LDC_TextChanged;
-			tb_LDC_l2.TextChanged+=LDC_TextChanged;
-			tb_LDC_l1.TextChanged+=delegate { refreshLcdL1=true; };
-			tb_LDC_l2.TextChanged+=delegate { refreshLcdL2=true; };*/
-
-			IHMmessage[0]=(byte)'t';
-			IHMmessage[1]=(byte)'e';
-			IHMmessage[2]=(byte)'c';
-			IHMmessage[3]=(byte)'l';
-			IHMmessage[4]=(byte)'a';
-			IHMmessage[5]=(byte)' ';
-			for(int i=0x06; i<0x10; i++) IHMmessage[i]=(byte)' ';
-
-			IHMmessage[0x10]=(byte)'p';
-			IHMmessage[0x11]=(byte)'r';
-			IHMmessage[0x12]=(byte)'e';
-			IHMmessage[0x13]=(byte)'c';
-			IHMmessage[0x14]=(byte)'i';
-			IHMmessage[0x15]=(byte)'o';
-			IHMmessage[0x16]=(byte)'n';
-			IHMmessage[0x17]=(byte)'a';
-			IHMmessage[0x18]=(byte)'d';
-			IHMmessage[0x19]=(byte)'a';
-			for(int i = 0x1A; i<0x20; i++) IHMmessage[i]=(byte)' ';
+			IHMmessage=makeMessage("It isn't fun", "     any more");
 		}
 
 		private void InterpretaMensagem(object sender, MessageReceivedEventArgs e) {
@@ -126,79 +102,33 @@ namespace ModBus {
 						if(answerBody[0]!=1) return;       //só é feita leitura de 8 bits
 						
 						if(queryBody[0]==0 && queryBody[1]==(int)MemoryAddress.Coils+6) {
-							CoilsState[7]=( answerBody[1]&0x01 )!=0;
-							CoilsState[6]=( answerBody[1]&0x02 )!=0;
-
-							//B_motorState&=0xFC;     //zera os dois ultimos bits
-							//B_motorState+=answerBody[1];
-
+							if(answerBody[1]<4) motorState[3]=answerBody[1];
 							Invoke(new EventHandler(AtualizaTelaMotores));
 						}
-						//B_motorState=answer.GetBody()[1];         //contem a resposta dos 8 bits
-						//Invoke(new EventHandler(AtualizaTelaMotores));
-						//talez colocar o codigo de ligar e desligar os motores aqui, logo apos ler o estado atual deles
 						break;
 					case (byte)MessageType.ReadNInputs:
-						if(answerBody[0]!=2&&answerBody.Count()!=3) return;       //só é feita leitura de 16 bits
-
-						//bool[] kbbits = new bool[16];
+						if(answerBody[0]!=2&&answerBody.Count()!=3) return;       //só é feita leitura de 16 bits	// o teclado inteiro
 						ushort kb = (ushort)(256*answerBody[1]+answerBody[2]);
 						byte c=0;
 						List<ushort> mes = new List<ushort>();
 						for(ushort mask = 0x8000; mask>0; mask>>=1, c++) {
 							if(( kb&mask )!=0) {
-								//IHMmessage[6]=(byte)teclas[c];
 								IHMmessage=makeMessage("tecla "+teclas[c], "precionada");
-
 								foreach(byte b in IHMmessage) mes.Add((ushort)b);
 								modBusPort.EscreverMensagem(Message.WriteNHoldingRegisters(1, 0x26, mes));
-								//modBusPort.EscreverMensagem(Message.WriteNHoldingRegisters(1, 0x26, IHMmessage));
 								Invoke(new EventHandler(AtualizaLcd));
 								n=0;
 								return;
 							}
 						}
-
 						IHMmessage=makeMessage(""+( ++n ), "atualizacoes");
 						foreach(byte b in IHMmessage) mes.Add((ushort)b);
 						modBusPort.EscreverMensagem(Message.WriteNHoldingRegisters(1, 0x26, mes));
-						//modBusPort.EscreverMensagem(Message.WriteNHoldingRegisters(1, 0x26, IHMmessage));
 						Invoke(new EventHandler(AtualizaLcd));
-
-						/*byte b;
-						int c = 0;
-						b=answer.GetBody()[1];
-						for(byte mask = 0x01; mask<=0x80; mask<<=1) {
-							if((b&mask)!=0){
-								IHMmessage[6]=(byte)teclas[c];
-
-								int j=c;
-
-								modBusPort.EscreverMensagem(Message.WriteNHoldingRegisters(1, 0x26, IHMmessage));
-//								modBusPort.EscreverMensagem(Message.WriteNHoldingRegisters(1, 0x36, IHMmessagel2));
-								return;
-							}else c++;
-						}
-						b=answer.GetBody()[2];
-						for(byte mask = 0x01; mask<=0x80; mask<<=1) {
-							if((b&mask)!=0){
-								IHMmessage[6]=(byte)teclas[c];
-								modBusPort.EscreverMensagem(Message.WriteNHoldingRegisters(1, 0x26, IHMmessage));
-//								modBusPort.EscreverMensagem(Message.WriteNHoldingRegisters(1, 0x36, IHMmessagel2));
-								return;
-							}else c++;
-						}*/
 						break;
-					/*case (byte)MessageType.WriteNHoldingRegisters:	//aqui nao precisa fazer nada	//drink a beer
-						switch(answer.GetBody()[1]) {	
-							case 0x20:  //set valor de temperatura ok
-								break;
-							case 0x22:  //set tempo de motores ok
-								break;
-						}
-						break;*/
+					//case (byte)MessageType.WriteNHoldingRegisters:	//aqui nao precisa fazer nada	//drink a beer
+					//	break;
 					case (byte)MessageType.ReadNHoldingRegisters:
-						//if(bv[0]!=4) return;                    //se for a leitura de mais de 2 HoldingRegisters (um float 32 bits)
 						if(queryBody[1]==(byte)MemoryAddress.Temp) {  // leitura da temperatura	//adrress
 							if(answerBody.Count!=5) return;                 //verificar //1 para o numero de bytes e 4 para o float
 							if(answerBody[0]!=4) return;					//byte count
@@ -213,31 +143,29 @@ namespace ModBus {
 							} catch(Exception) { }
 						}else if(queryBody[1]==(byte)MemoryAddress.Tms) {
 							ushort t;
-							bool changeCoilsState=false;
+							bool changeMotorState=false;
 
 							t=(ushort)(256*answerBody[1]+answerBody[0]);
 							if(t>nud_m1.Value&&motorState[0]==(byte)e_motorState.estrela) {           //troca para triangulo
-								CoilsState[0]=false; CoilsState[1]=true; changeCoilsState=true;
+								motorState[0]=(byte)e_motorState.triangulo;
+								changeMotorState=true;
 							}
 							t=(ushort)( 256*answerBody[3]+answerBody[2] );
 							if(t>nud_m2.Value&&motorState[1]==(byte)e_motorState.estrela) {
-								CoilsState[2]=false; CoilsState[3]=true; changeCoilsState=true;
+								motorState[1]=(byte)e_motorState.triangulo;
+								changeMotorState=true;
 							}
 							t=(ushort)( 256*answerBody[5]+answerBody[4] );
 							if(t>nud_m3.Value&&motorState[2]==(byte)e_motorState.estrela) {
-								CoilsState[4]=false; CoilsState[5]=true; changeCoilsState=true;
+								motorState[2]=(byte)e_motorState.triangulo;
+								changeMotorState=true;
 							}
-							if(changeCoilsState) {
-								List<bool> Coils = new List<bool>();
-								Coils.Add(CoilsState[0]); Coils.Add(CoilsState[1]); Coils.Add(CoilsState[2]);
-								Coils.Add(CoilsState[3]); Coils.Add(CoilsState[4]); Coils.Add(CoilsState[5]);
+							if(changeMotorState) {
+								List<bool> Coils = CoilsState();
 								modBusPort.EscreverMensagem(Message.WriteNCoils(1, (ushort)MemoryAddress.Coils, Coils));
-
 								Invoke(new EventHandler(AtualizaTelaMotores));
 							}
 						}
-						//if(query.GetBody()[1]==(byte)MemoryAddress.Tms){			////////////////////////////////////////////////////////////////////
-						//}
 						break;
 					case (byte)MessageType.WriteNCoils:
 						if(answerBody[1]==(byte)MemoryAddress.Coils && answerBody[3] == 6) {
@@ -276,19 +204,19 @@ namespace ModBus {
 		}
 
 		private void AtualizaTelaMotores(object sender, EventArgs e) {
-			lbl_status_m1.Text=s_motorState[(byte)( ( CoilsState[0] ? 2 : 0 )+( CoilsState[1] ? 1 : 0 ) )];
-			lbl_status_m2.Text=s_motorState[(byte)( ( CoilsState[2] ? 2 : 0 )+( CoilsState[3] ? 1 : 0 ) )];
-			lbl_status_m3.Text=s_motorState[(byte)( ( CoilsState[4] ? 2 : 0 )+( CoilsState[5] ? 1 : 0 ) )];
-			lbl_status_m4.Text=s_motorState[(byte)( ( CoilsState[6] ? 2 : 0 )+( CoilsState[7] ? 1 : 0 ) )];
+			lbl_status_m1.Text=s_motorState[motorState[0]];
+			lbl_status_m2.Text=s_motorState[motorState[1]];
+			lbl_status_m3.Text=s_motorState[motorState[2]];
+			lbl_status_m4.Text=s_motorState[motorState[3]];
 		}
 		private void AtualizaTelaTemperatura(object sender, EventArgs e) {
 			tb_cur_tem.Text=temperatura.ToString();
 		}
 		private void AtualizaLcd(object sender, EventArgs e) {
 			tb_LDC_l1.Clear();
-			for(byte b = 0; b<16; b++) tb_LDC_l1.AppendText( ""+(char)IHMmessage[b] );// ($"{IHMmessage[b]:x2}");
+			for(byte b = 0; b<16; b++)  tb_LDC_l1.AppendText(""+(char)IHMmessage[b]);
 			tb_LDC_l2.Clear();
-			for(byte b = 16; b<32; b++) tb_LDC_l2.AppendText(""+(char)IHMmessage[b] );// ($"{IHMmessage[b]:x2}");
+			for(byte b = 16; b<32; b++) tb_LDC_l2.AppendText(""+(char)IHMmessage[b]);
 		}
 
 		private void InterpretaMensagemSemResposta(object sender, MessageTimeOutEventArgs e) {  //so para teste por enquanto
@@ -311,34 +239,34 @@ namespace ModBus {
 			modBusPort.EscreverMensagem(Message.ReadNInputs(1, (ushort)MemoryAddress.Inputs, 16));              //le o teclado
 			modBusPort.EscreverMensagem(Message.ReadNCoils(1, (ushort)MemoryAddress.Coils+6, 2));               //le o quarto motor
 
-			bool changeCoilsState=false;
-			if(motorUserComand[0] &&lbl_status_m1.Text==s_motorState[0]) {			//ligar motor 0
-				CoilsState[0]=true;
-				CoilsState[1]=false;
-				changeCoilsState=true;
-			} else if(!motorUserComand[0]&&lbl_status_m1.Text!=s_motorState[0]) {	//desligar motor 0
-				CoilsState[0]=false;
-				CoilsState[1]=false;
-				changeCoilsState=true;
+			bool changeMotorState=false;
+			if(motorUserComand[0] && motorState[0]==(byte)e_motorState.desligado) {         //ligar motor 0
+				motorState[0]=(byte)e_motorState.estrela;
+				changeMotorState=true;
+			} else if(!motorUserComand[0]&&motorState[0]!=(byte)e_motorState.desligado) { //desligar motor 0
+				motorState[0]=(byte)e_motorState.desligado;
+				changeMotorState=true;
 			}
-			if(motorUserComand[1]&&lbl_status_m2.Text==s_motorState[0]) {			//ligar motor 1
-				CoilsState[2]=true;CoilsState[3]=false;changeCoilsState=true;
-			} else if(!motorUserComand[1]&&lbl_status_m2.Text!=s_motorState[0]) {   //desligar motor 1
-				CoilsState[2]=false;CoilsState[3]=false;changeCoilsState=true;
+			if(motorUserComand[1]&&motorState[1]==(byte)e_motorState.desligado) {         //ligar motor 0
+				motorState[1]=(byte)e_motorState.estrela;
+				changeMotorState=true;
+			} else if(!motorUserComand[1]&&motorState[1]!=(byte)e_motorState.desligado) { //desligar motor 0
+				motorState[1]=(byte)e_motorState.desligado;
+				changeMotorState=true;
 			}
-			if(motorUserComand[2]&&lbl_status_m3.Text==s_motorState[0]) {           //ligar motor 2
-				CoilsState[4]=true;CoilsState[5]=false;changeCoilsState=true;
-			} else if(!motorUserComand[2]&&lbl_status_m3.Text!=s_motorState[0]) {   //desligar motor 2
-				CoilsState[4]=false;CoilsState[5]=false;changeCoilsState=true;
+			if(motorUserComand[2]&&motorState[2]==(byte)e_motorState.desligado) {         //ligar motor 0
+				motorState[2]=(byte)e_motorState.estrela;
+				changeMotorState=true;
+			} else if(!motorUserComand[2]&&motorState[2]!=(byte)e_motorState.desligado) { //desligar motor 0
+				motorState[2]=(byte)e_motorState.desligado;
+				changeMotorState=true;
 			}
-			if(changeCoilsState) {
-				List<bool> Coils = new List<bool>();
-				Coils.Add(CoilsState[0]); Coils.Add(CoilsState[1]); Coils.Add(CoilsState[2]);
-				Coils.Add(CoilsState[3]); Coils.Add(CoilsState[4]); Coils.Add(CoilsState[5]);
+			if(changeMotorState) {
+				List<bool> Coils = CoilsState();
 				modBusPort.EscreverMensagem(Message.WriteNCoils(1, (ushort)MemoryAddress.Coils, Coils));
 			}
 			
-			if(motorState[0]==(byte)e_motorState.estrela || motorState[2]==(byte)e_motorState.estrela || motorState[3]==(byte)e_motorState.estrela)
+			if(motorState[0]==(byte)e_motorState.estrela || motorState[1]==(byte)e_motorState.estrela || motorState[2]==(byte)e_motorState.estrela)
 				modBusPort.EscreverMensagem(Message.ReadNHoldingRegisters(1, (ushort)MemoryAddress.Tm1, 3));
 		}
 
@@ -428,25 +356,67 @@ namespace ModBus {
 				//Array.Reverse(vec);
 				//modBusPort.EscreverMensagem(Message.WriteNHoldingRegisters(1, (ushort)MemoryAddress.SetPoint, vec));
 
-				bool[] coils = {true, false, true, false, false, false};
-				List<bool> Coils = new List<bool>();
-				Coils.AddRange(coils);
-				modBusPort.EscreverMensagem(Message.WriteNCoils(1, (ushort)MemoryAddress.Coils, Coils));
+				//bool[] coils = {true, false, true, false, false, false};
+				//List<bool> Coils = new List<bool>();
+				//Coils.AddRange(coils);
+				//modBusPort.EscreverMensagem(Message.WriteNCoils(1, (ushort)MemoryAddress.Coils, Coils));
+
+				bool changeMotorState=false;
+				if(motorUserComand[0]&&motorState[0]==(byte)e_motorState.desligado) {         //ligar motor 0
+					motorState[0]=(byte)e_motorState.estrela;
+					changeMotorState=true;
+				} else if(!motorUserComand[0]&&motorState[0]!=(byte)e_motorState.desligado) { //desligar motor 0
+					motorState[0]=(byte)e_motorState.desligado;
+					changeMotorState=true;
+				}
+				if(motorUserComand[1]&&motorState[1]==(byte)e_motorState.desligado) {         //ligar motor 0
+					motorState[1]=(byte)e_motorState.estrela;
+					changeMotorState=true;
+				} else if(!motorUserComand[1]&&motorState[1]!=(byte)e_motorState.desligado) { //desligar motor 0
+					motorState[1]=(byte)e_motorState.desligado;
+					changeMotorState=true;
+				}
+				if(motorUserComand[2]&&motorState[2]==(byte)e_motorState.desligado) {         //ligar motor 0
+					motorState[2]=(byte)e_motorState.estrela;
+					changeMotorState=true;
+				} else if(!motorUserComand[2]&&motorState[2]!=(byte)e_motorState.desligado) { //desligar motor 0
+					motorState[2]=(byte)e_motorState.desligado;
+					changeMotorState=true;
+				}
+				if(changeMotorState) {
+					List<bool> Coils = CoilsState();
+					modBusPort.EscreverMensagem(Message.WriteNCoils(1, (ushort)MemoryAddress.Coils, Coils));
+				}
+				//if(	motorUserComand[0]&&motorState[0]==(byte)e_motorState.desligado||
+				//	motorUserComand[1]&&motorState[1]==(byte)e_motorState.desligado||
+				//	motorUserComand[2]&&motorState[2]==(byte)e_motorState.desligado){
+				//	List<bool> Coils = CoilsState();
+				//	modBusPort.EscreverMensagem(Message.WriteNCoils(1, (ushort)MemoryAddress.Coils, Coils));
+				//}
 
 				//modBusPort.EscreverMensagem(Message.ReadNCoils(1, (ushort)MemoryAddress.Coils+6, 2));
 				//modBusPort.EscreverMensagem(Message.WriteSigleHoldingRegisters(1, (ushort)MemoryAddress.Tm4, (ushort)nud_m4.Value));
 			} catch(Exception) { }
 		}
-		
-		private void LDC_TextChanged(object sender, EventArgs e) {
-			TextBox t = (TextBox)sender;
-			if(t.Text.Length>16) {
-				t.Text = t.Text.Remove(16);		//remove todos os caracteres depois do decimo sexto
-			}
-		}
-
 		private void button1_Click(object sender, EventArgs e) {
-			modBusPort.EscreverMensagem(Message.ReadNHoldingRegisters(1, (ushort)MemoryAddress.Tm1, 3));
+			try {
+				modBusPort.EscreverMensagem(Message.ReadNHoldingRegisters(1, (ushort)MemoryAddress.Tm1, 3));
+			} catch(Exception) { }
+		}		
+
+		List<bool> CoilsState() {
+			List<bool> res = new List<bool>();
+
+			res.Add(( motorState[0]&0x02 )!=0);
+			res.Add(( motorState[0]&0x01 )!=0);
+			res.Add(( motorState[1]&0x02 )!=0);
+			res.Add(( motorState[1]&0x01 )!=0);
+			res.Add(( motorState[2]&0x02 )!=0);
+			res.Add(( motorState[2]&0x01 )!=0);
+
+			//byte b = (byte)(motorState[0]<<6 + motorState[1]<<4 + motorState[3]<<2);
+			//for(byte mask = 0x20; mask>0x00; mask>>=1) res.Add(( b&mask )!=0);
+			return res;
 		}
 	}
 }
