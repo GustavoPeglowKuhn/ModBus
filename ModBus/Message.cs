@@ -10,6 +10,9 @@ namespace ModBus {
 		//se for utilizar isso, criar um enum com valores como BAIXA_PRIORIDADE = 1, ALTA_PRIORIDADE = 10 e outros
 		//o valor deve ser passado no construtor da mensagem
 
+		static byte[] bitMaskD = { 0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01 };
+		static byte[] bitMaskC = { 0x01, 0x02, 0x04, 0x08, 0x10, 0x02, 0x04, 0x08 };
+
 		private List<byte> message;
 
 		public Message(byte device, byte mType, List<byte> body) {
@@ -114,12 +117,12 @@ namespace ModBus {
 			if(nRegisters>125) throw new BadMessageException("More than 125 Registers");   //limite do protocolo, exede o tamanho do frame
 
 			byte[] fisrt = BitConverter.GetBytes(startingAddress);
-			byte[] num = BitConverter.GetBytes(nRegisters);
+			//byte[] num = BitConverter.GetBytes(nRegisters);
 			byte[] body = new byte[4];
 			body[0]=fisrt[1];   //startingAddress HI
 			body[1]=fisrt[0];   //startingAddress LO
 			body[2]=0;          //ever 0
-			body[3]=num[0];     //nRegisters	  LO
+			body[3]=(byte)nRegisters;            //num[0];     //nRegisters	  LO
 
 			return new Message(dispositivo, (byte)MessageType.ReadNHoldingRegisters, body);
 		}
@@ -136,14 +139,12 @@ namespace ModBus {
 		}
 
 		/*Message 6 - Write a single Holding Registers*/
-		static public Message WriteSigleHoldingRegisters(byte dispositivo, ushort registerAddress, bool registerValue) {
-			byte[] fisrt = BitConverter.GetBytes(registerAddress);
-			byte[] value = BitConverter.GetBytes(registerValue);
+		static public Message WriteSigleHoldingRegisters(byte dispositivo, ushort registerAddress, ushort registerValue) {
 			byte[] body = new byte[4];
-			body[0]=fisrt[1];   //CoilAddress	HI
-			body[1]=fisrt[0];   //CoilAddress	LO
-			body[2]=value[1];   //registerValue HI
-			body[3]=value[0];   //registerValue LO
+			body[0]=(byte)( registerAddress>>8 );	//CoilAddress	HI
+			body[1]=(byte)( registerAddress );		//CoilAddress	LO
+			body[2]=(byte)( registerValue>>8 );		//registerValue HI
+			body[3]=(byte)( registerValue );		//registerValue LO
 			return new Message(dispositivo, (byte)MessageType.WriteSigleHoldingRegisters, body);
 		}
 
@@ -164,14 +165,44 @@ namespace ModBus {
 			body[3]=num[0];
 			body[4]=N;
 
-			for(byte i = 0; i<N; i++) {
+			/*for(byte i = 0; i<N; i++) {
 				int j = i*8;
 				int aux = 0;
 				for(int k = 0; k<8&&j+k<nCoils; k++) {
 					if(values[j+k]) aux+=2^k;
 				}
 				body[5+i]=(byte)aux;
+			}*/
+
+
+			/*byte mask = (byte)(nCoils<8?bitMaskD[8-nCoils]:0x80);		///deixar so a declaracao
+			byte resByte = 0;
+			for(int i = 0; i<nCoils; i++) {
+				if(mask==0) {
+					mask=(byte)( nCoils-i<8 ? bitMaskD[nCoils-i] : 0x80 );
+					resByte++;
+					body[5+resByte]=0;
+				}
+
+				if(values[i]) body[5+resByte]+=mask;
+
+				mask>>=1;
+			}*/
+
+			byte mask = 0x01;
+			byte resByte = 0; ;
+			body[5]=0;				//zera os bit não utilizados
+			for(int i = 0; i<nCoils; i++) {
+				if(values[i]) body[5+resByte]+=mask;
+
+				if(mask==0x80) {
+					mask=0x01;		//bits alinhads a direita
+					resByte++;
+					body[5+resByte]=0;
+				}else mask<<=1;
 			}
+
+			//byte b = body[5];		//just for a test
 
 			return new Message(dispositivo, (byte)MessageType.WriteNCoils, body);
 		}
