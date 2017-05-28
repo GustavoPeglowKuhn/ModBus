@@ -34,9 +34,9 @@ namespace ModBus {
 		enum e_devices : byte { broadcast, kl25 };
 		static string[] devices = { "broadcast", "kl25" };
 
-		enum e_motorState : byte { desligado=0, estrela=0x02, triangulo=0x01 };       //estrela b10 e triangulo b01
+		enum e_motorState : byte { desligado=0, triangulo=0x01, estrela = 0x02 };       //estrela b10 e triangulo b01
 		byte[] motorState = { (byte)e_motorState.desligado, (byte)e_motorState.desligado, (byte)e_motorState.desligado, (byte)e_motorState.desligado };
-		string[] s_motorState = { "desligado", "estrela", "triangulo", "est e tri" };
+		string[] s_motorState = { "desligado", "triangulo", "estrela", "est e tri" };  //estrela b10 e triangulo b01
 		bool[] motorUserComand = { false, false, false, false };
 		//byte B_motorState = 0x00;
 		//bool[] CoilsState = { false, false, false, false , false, false, false, false };	//8-bits
@@ -84,9 +84,9 @@ namespace ModBus {
 			modBusPort.MessageTimeOut+=InterpretaMensagemSemResposta;
 
 			lbl_status_m1.Text=s_motorState[0];
-			lbl_status_m2.Text=s_motorState[1];
-			lbl_status_m3.Text=s_motorState[2];
-			lbl_status_m4.Text=s_motorState[3];
+			lbl_status_m2.Text=s_motorState[0];
+			lbl_status_m3.Text=s_motorState[0];
+			lbl_status_m4.Text=s_motorState[0];
 
 			IHMmessage=makeMessage("It isn't fun", "     any more");
 		}
@@ -99,10 +99,9 @@ namespace ModBus {
 				switch(query.GetMessageType()) {
 					case (byte)MessageType.ReadNCoils:   //message 1
 														 //byte 0:	*N = Quantity of Outputs / 8, if the remainder is different of 0 ⇒ N = N+1
-						if(answerBody[0]!=1) return;       //só é feita leitura de 8 bits
-						
-						if(queryBody[0]==0 && queryBody[1]==(int)MemoryAddress.Coils+6) {
-							if(answerBody[1]<4) motorState[3]=answerBody[1];
+						if(answerBody[0]!=1) return;     //só é feita leitura de 2 bits
+						if(queryBody[0]==0&&queryBody[1]==(int)MemoryAddress.Coils+6&&queryBody[2]==0x00&&queryBody[3]==0x02) {
+							motorState[3]=(byte)( ( ( ( answerBody[1]&0x01 )!=0 ) ? 2 : 0 )+( ( ( answerBody[1]&0x02 )!=0 ) ? 1 : 0 ) );
 							Invoke(new EventHandler(AtualizaTelaMotores));
 						}
 						break;
@@ -144,21 +143,16 @@ namespace ModBus {
 						}else if(queryBody[1]==(byte)MemoryAddress.Tms) {
 							ushort t;
 							bool changeMotorState=false;
-
-							t=(ushort)(256*answerBody[1]+answerBody[0]);
-							if(t>nud_m1.Value&&motorState[0]==(byte)e_motorState.estrela) {           //troca para triangulo
-								motorState[0]=(byte)e_motorState.triangulo;
-								changeMotorState=true;
-							}
-							t=(ushort)( 256*answerBody[3]+answerBody[2] );
-							if(t>nud_m2.Value&&motorState[1]==(byte)e_motorState.estrela) {
-								motorState[1]=(byte)e_motorState.triangulo;
-								changeMotorState=true;
-							}
-							t=(ushort)( 256*answerBody[5]+answerBody[4] );
-							if(t>nud_m3.Value&&motorState[2]==(byte)e_motorState.estrela) {
-								motorState[2]=(byte)e_motorState.triangulo;
-								changeMotorState=true;
+							ushort[] tn = new ushort[3];
+							tn[0]=(ushort)nud_m1.Value;
+							tn[1]=(ushort)nud_m2.Value;
+							tn[2]=(ushort)nud_m3.Value;
+							for(int i=0; i<3; i++) {
+								t=(ushort)( 256*answerBody[1+2*i]+answerBody[0+2*i] );
+								if(t>tn[i]&&motorState[i]==(byte)e_motorState.estrela) {           //troca para triangulo
+									motorState[i]=(byte)e_motorState.triangulo;
+									changeMotorState=true;
+								}
 							}
 							if(changeMotorState) {
 								List<bool> Coils = CoilsState();
@@ -169,12 +163,12 @@ namespace ModBus {
 						break;
 					case (byte)MessageType.WriteNCoils:
 						if(answerBody[1]==(byte)MemoryAddress.Coils && answerBody[3] == 6) {
-							byte mask=0x03;
+							/*byte mask=0x03;
 							motorState[0]=(byte)( queryBody[5]&mask );
 							mask<<=2;
 							motorState[0]=(byte)( queryBody[5]&mask );
 							mask<<=2;
-							motorState[0]=(byte)( queryBody[5]&mask );
+							motorState[0]=(byte)( queryBody[5]&mask );*/
 						}
 						break;
 					//testar o enio antes de habilitar a funcoes de erro
@@ -240,34 +234,22 @@ namespace ModBus {
 			modBusPort.EscreverMensagem(Message.ReadNCoils(1, (ushort)MemoryAddress.Coils+6, 2));               //le o quarto motor
 
 			bool changeMotorState=false;
-			if(motorUserComand[0] && motorState[0]==(byte)e_motorState.desligado) {         //ligar motor 0
-				motorState[0]=(byte)e_motorState.estrela;
-				changeMotorState=true;
-			} else if(!motorUserComand[0]&&motorState[0]!=(byte)e_motorState.desligado) { //desligar motor 0
-				motorState[0]=(byte)e_motorState.desligado;
-				changeMotorState=true;
-			}
-			if(motorUserComand[1]&&motorState[1]==(byte)e_motorState.desligado) {         //ligar motor 0
-				motorState[1]=(byte)e_motorState.estrela;
-				changeMotorState=true;
-			} else if(!motorUserComand[1]&&motorState[1]!=(byte)e_motorState.desligado) { //desligar motor 0
-				motorState[1]=(byte)e_motorState.desligado;
-				changeMotorState=true;
-			}
-			if(motorUserComand[2]&&motorState[2]==(byte)e_motorState.desligado) {         //ligar motor 0
-				motorState[2]=(byte)e_motorState.estrela;
-				changeMotorState=true;
-			} else if(!motorUserComand[2]&&motorState[2]!=(byte)e_motorState.desligado) { //desligar motor 0
-				motorState[2]=(byte)e_motorState.desligado;
-				changeMotorState=true;
-			}
-			if(changeMotorState) {
+			for(int i = 0; i<3; i++) {
+				if(motorUserComand[i]&&motorState[i]==(byte)e_motorState.desligado) {         //ligar motor em estrela
+					motorState[i]=(byte)e_motorState.estrela;
+					changeMotorState=true;
+				} else if(!motorUserComand[i]&&motorState[i]!=(byte)e_motorState.desligado) { //desligar motor
+					motorState[i]=(byte)e_motorState.desligado;
+					changeMotorState=true;
+				}
+			}if(changeMotorState) {
 				List<bool> Coils = CoilsState();
 				modBusPort.EscreverMensagem(Message.WriteNCoils(1, (ushort)MemoryAddress.Coils, Coils));
+				Invoke(new EventHandler(AtualizaTelaMotores));
 			}
-			
+
 			if(motorState[0]==(byte)e_motorState.estrela || motorState[1]==(byte)e_motorState.estrela || motorState[2]==(byte)e_motorState.estrela)
-				modBusPort.EscreverMensagem(Message.ReadNHoldingRegisters(1, (ushort)MemoryAddress.Tm1, 3));
+				modBusPort.EscreverMensagem(Message.ReadNHoldingRegisters(1, (ushort)MemoryAddress.Tms, 3));	// ja le os 3 juntos, nao  faz tanta diferenca caso so precise de 1, mas economiza muito caso  precise dos 3
 		}
 
 		private void ms_sp_port_combobox_DropDown(object sender, EventArgs e) {
@@ -351,42 +333,32 @@ namespace ModBus {
 				//modBusPort.EscreverMensagem(Message.ReadNCoils(1, 0x00, 8));				//8leds
 				//modBusPort.EscreverMensagem(Message.ReadNInputs(1, 0x00, 16));			//le o teclado
 
+				////////////////////////////////////////troca o setPoint do slave
 				//float ftemp = (float)nud_setTemp.Value;										//float.Parse(tb_set_tem.Text.ToString());
 				//byte[] vec = BitConverter.GetBytes(ftemp);
 				//Array.Reverse(vec);
 				//modBusPort.EscreverMensagem(Message.WriteNHoldingRegisters(1, (ushort)MemoryAddress.SetPoint, vec));
 
-				//bool[] coils = {true, false, true, false, false, false};
-				//List<bool> Coils = new List<bool>();
-				//Coils.AddRange(coils);
-				//modBusPort.EscreverMensagem(Message.WriteNCoils(1, (ushort)MemoryAddress.Coils, Coils));
+				//////////////////////////////////////troca os  motores
+				//bool changeMotorState=false;
+				//for(int i = 0; i<3; i++) {
+				//	if(motorUserComand[i]&&motorState[i]==(byte)e_motorState.desligado) {         //ligar motor
+				//		motorState[i]=(byte)e_motorState.estrela;
+				//		changeMotorState=true;
+				//	} else if(!motorUserComand[i]&&motorState[i]!=(byte)e_motorState.desligado) { //desligar motor
+				//		motorState[i]=(byte)e_motorState.desligado;
+				//		changeMotorState=true;
+				//	}
+				//}
+				//if(changeMotorState) {
+				//	List<bool> Coils = CoilsState();
+				//	modBusPort.EscreverMensagem(Message.WriteNCoils(1, (ushort)MemoryAddress.Coils, Coils));
+				//	Invoke(new EventHandler(AtualizaTelaMotores));
+				//}
 
-				bool changeMotorState=false;
-				if(motorUserComand[0]&&motorState[0]==(byte)e_motorState.desligado) {         //ligar motor 0
-					motorState[0]=(byte)e_motorState.estrela;
-					changeMotorState=true;
-				} else if(!motorUserComand[0]&&motorState[0]!=(byte)e_motorState.desligado) { //desligar motor 0
-					motorState[0]=(byte)e_motorState.desligado;
-					changeMotorState=true;
-				}
-				if(motorUserComand[1]&&motorState[1]==(byte)e_motorState.desligado) {         //ligar motor 0
-					motorState[1]=(byte)e_motorState.estrela;
-					changeMotorState=true;
-				} else if(!motorUserComand[1]&&motorState[1]!=(byte)e_motorState.desligado) { //desligar motor 0
-					motorState[1]=(byte)e_motorState.desligado;
-					changeMotorState=true;
-				}
-				if(motorUserComand[2]&&motorState[2]==(byte)e_motorState.desligado) {         //ligar motor 0
-					motorState[2]=(byte)e_motorState.estrela;
-					changeMotorState=true;
-				} else if(!motorUserComand[2]&&motorState[2]!=(byte)e_motorState.desligado) { //desligar motor 0
-					motorState[2]=(byte)e_motorState.desligado;
-					changeMotorState=true;
-				}
-				if(changeMotorState) {
-					List<bool> Coils = CoilsState();
-					modBusPort.EscreverMensagem(Message.WriteNCoils(1, (ushort)MemoryAddress.Coils, Coils));
-				}
+				//////////////////////////////////////le o estado do quarto motor
+				modBusPort.EscreverMensagem(Message.ReadNCoils(1, (ushort)MemoryAddress.Coils+6, 2));
+
 				//if(	motorUserComand[0]&&motorState[0]==(byte)e_motorState.desligado||
 				//	motorUserComand[1]&&motorState[1]==(byte)e_motorState.desligado||
 				//	motorUserComand[2]&&motorState[2]==(byte)e_motorState.desligado){
@@ -400,7 +372,8 @@ namespace ModBus {
 		}
 		private void button1_Click(object sender, EventArgs e) {
 			try {
-				modBusPort.EscreverMensagem(Message.ReadNHoldingRegisters(1, (ushort)MemoryAddress.Tm1, 3));
+				/////////////////////////////////verifica o tempo dos motores
+				//modBusPort.EscreverMensagem(Message.ReadNHoldingRegisters(1, (ushort)MemoryAddress.Tm1, 3));
 			} catch(Exception) { }
 		}		
 
