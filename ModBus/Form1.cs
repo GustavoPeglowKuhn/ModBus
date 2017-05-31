@@ -57,7 +57,9 @@ namespace ModBus {
 		bool refreshMotorTime = true;
 		bool refreshTemperature = true;
 
-//		int lostMessagesCount = 0; //o contador deve ser interno da classe ModBusPort. Um arquivo de log deve ser salvo em %APPDATA%/ModBusPort/errors.log.txt
+		int nextMessage = 0;
+
+		//int lostMessagesCount = 0; //o contador deve ser interno da classe ModBusPort. Um arquivo de log deve ser salvo em %APPDATA%/ModBusPort/errors.log.txt
 
 		public Form1() {
 			InitializeComponent();
@@ -83,11 +85,13 @@ namespace ModBus {
 				RefreshRegisters();
 				refreshTimer.Enabled=true;
 			};
-			refreshTimer.Interval=750; //planejar esse tempo depois
+			refreshTimer.Interval=150*modBusPort.timeChar_ms(); //planejar esse tempo depois
 			
 			modBusPort.MessageReceived+=InterpretaMensagem;
+			//modBusPort.MessageReceived+=delegate { RefreshRegisters(); };
 			modBusPort.MessageTimeOut+=InterpretaMensagemSemResposta;
-
+			//modBusPort.MessageTimeOut+=delegate { RefreshRegisters(); };
+			
 			lbl_status_m1.Text=s_motorState[0];
 			lbl_status_m2.Text=s_motorState[0];
 			lbl_status_m3.Text=s_motorState[0];
@@ -100,7 +104,7 @@ namespace ModBus {
 			if(ErrorCount>0) ErrorCount--;
 			Message query = e.MessagePair.Key, answer = e.MessagePair.Value;
 			List<byte> queryBody=query.GetBody(), answerBody=answer.GetBody();
-
+			
 			if(query.GetDevice()==(byte)e_devices.kl25) {
 				switch(query.GetMessageType()) {
 					case (byte)MessageType.ReadNCoils:   //message 1
@@ -231,42 +235,58 @@ namespace ModBus {
 		public void RefreshRegisters() {
 			if(modBusPort.WaitingMessage) return;                                   // evita sobrecarga no buffer da porta ModBus
 
-			
-			//////////////////////////////////////troca os  motores
-			bool changeMotorState=false;
-			for(int i = 0; i<3; i++) {
-				if(motorUserComand[i]&&motorState[i]==(byte)e_motorState.desligado) {         //ligar motor
-					motorState[i]=(byte)e_motorState.estrela;
-					changeMotorState=true;
-				} else if(( !motorUserComand[i] )&&motorState[i]!=(byte)e_motorState.desligado) { //desligar motor
-					motorState[i]=(byte)e_motorState.desligado;
-					changeMotorState=true;
+			if(nextMessage==0) {
+				bool changeMotorState=false;
+				for(int i = 0; i<3; i++) {
+					if(motorUserComand[i]&&motorState[i]==(byte)e_motorState.desligado) {         //ligar motor
+						motorState[i]=(byte)e_motorState.estrela;
+						changeMotorState=true;
+					} else if(( !motorUserComand[i] )&&motorState[i]!=(byte)e_motorState.desligado) { //desligar motor
+						motorState[i]=(byte)e_motorState.desligado;
+						changeMotorState=true;
+					}
 				}
+				if(!changeMotorState) {
+					nextMessage++;
+				}
+			} else {
+				if(nextMessage==2&&( !refreshMotorTime )) nextMessage++;
+				if(nextMessage==3&&( !refreshTemperature )) nextMessage++;
 			}
-			if(changeMotorState) {
-				List<bool> Coils = CoilsState();
-				modBusPort.EscreverMensagem(Message.WriteNCoils(1, (ushort)MemoryAddress.Coils, Coils));
-				Invoke(new EventHandler(AtualizaTelaMotores));
+			
+			switch(nextMessage) {
+				case 0:
+					List<bool> Coils = CoilsState();
+					modBusPort.EscreverMensagem(Message.WriteNCoils(1, (ushort)MemoryAddress.Coils, Coils));            //troca os  motores
+					Invoke(new EventHandler(AtualizaTelaMotores));
+					break;
+				case 1:
+					modBusPort.EscreverMensagem(Message.ReadNInputs(1, (ushort)MemoryAddress.Inputs, 16));              //le o teclado
+					break;
+				case 2:
+					modBusPort.EscreverMensagem(Message.WriteSigleHoldingRegisters(1, (ushort)MemoryAddress.Tm4, (ushort)nud_m4.Value));
+					refreshMotorTime=false;
+					break;
+				case 3:
+					byte[] vec = BitConverter.GetBytes((float)nud_setTemp.Value);										//envia a temperatura
+					Array.Reverse(vec);
+					modBusPort.EscreverMensagem(Message.WriteNHoldingRegisters(1, (int)MemoryAddress.SetPoint, vec));
+					refreshTemperature=false;
+					break;
+				case 4:
+					modBusPort.EscreverMensagem(Message.ReadNHoldingRegisters(1, (ushort)MemoryAddress.Temp, 2));       //le a temperatura do lm35
+					break;
+				case 5:
+					modBusPort.EscreverMensagem(Message.ReadNCoils(1, (ushort)MemoryAddress.Coils+6, 2));               //le o estado do quarto motor
+					break;
+				case 6:
+					if(motorState[0]==(byte)e_motorState.estrela||motorState[1]==(byte)e_motorState.estrela||motorState[2]==(byte)e_motorState.estrela)
+						modBusPort.EscreverMensagem(Message.ReadNHoldingRegisters(1, (ushort)MemoryAddress.Tms, 3));    // ja le os 3 juntos, nao  faz tanta diferenca caso so precise de 1, mas economiza muito caso  precise dos 3
+					nextMessage=0;
+					return; //retorna para nao incrementar nextMessage
 			}
 
-			modBusPort.EscreverMensagem(Message.ReadNInputs(1, (ushort)MemoryAddress.Inputs, 16));              //le o teclado
-
-			if(refreshMotorTime) {
-				modBusPort.EscreverMensagem(Message.WriteSigleHoldingRegisters(1, (ushort)MemoryAddress.Tm4, (ushort)nud_m4.Value));
-				refreshMotorTime=false;
-			}
-			if(refreshTemperature) {                                                //write in 2 hold register
-				byte[] vec = BitConverter.GetBytes((float)nud_setTemp.Value);
-				Array.Reverse(vec);
-				modBusPort.EscreverMensagem(Message.WriteNHoldingRegisters(1, (int)MemoryAddress.SetPoint, vec));
-				refreshTemperature=false;
-			}
-			modBusPort.EscreverMensagem(Message.ReadNHoldingRegisters(1, (ushort)MemoryAddress.Temp, 2));       //le a temperatura do lm35
-			//modBusPort.EscreverMensagem(Message.ReadNInputs(1, (ushort)MemoryAddress.Inputs, 16));              //le o teclado
-			modBusPort.EscreverMensagem(Message.ReadNCoils(1, (ushort)MemoryAddress.Coils+6, 2));               //le o estado do quarto motor
-
-			if(motorState[0]==(byte)e_motorState.estrela || motorState[1]==(byte)e_motorState.estrela || motorState[2]==(byte)e_motorState.estrela)
-				modBusPort.EscreverMensagem(Message.ReadNHoldingRegisters(1, (ushort)MemoryAddress.Tms, 3));	// ja le os 3 juntos, nao  faz tanta diferenca caso so precise de 1, mas economiza muito caso  precise dos 3
+			nextMessage++;
 		}
 
 		private void ms_sp_port_combobox_DropDown(object sender, EventArgs e) {
@@ -300,6 +320,7 @@ namespace ModBus {
 				ms_sp_conect.Enabled=false;
 				ms_sp_disconect.Enabled=true;
 				ErrorCount=0;
+				//RefreshRegisters();
 			} catch(Exception) {
 				//MessageBox.Show("Unable to conect to "+serialPort.PortName+" at "+serialPort.BaudRate+" kbps, select a valid port", "Conect Error");
 				MessageBox.Show("Unable to conect to "+modBusPort.PortName+" at "+modBusPort.BaudRate+" kbps, select a valid ModBusPort", "Conect Error");
@@ -346,7 +367,7 @@ namespace ModBus {
 
 		private void btn_test_Click(object sender, EventArgs e) {   //so para teste
 			try {
-				if(modBusPort.IsOpen) RefreshRegisters();
+				//if(modBusPort.IsOpen) RefreshRegisters();
 
 				//modBusPort.EscreverMensagem(Message.ReadNHoldingRegisters(1, (ushort)MemoryAddress.Tms, 4));	//temperatura
 				//modBusPort.EscreverMensagem(Message.ReadNHoldingRegisters(1, 0x18, 2));	//temperatura

@@ -133,7 +133,7 @@ namespace ModBus {
 		// Summary:
 		//     Calculate the time in miliseconds to the
 		//     System.IO.Ports.SerialPort send one byte.
-		private float timeChar_ms() {
+		public float timeChar_ms() {
 			float bpc;
 			if(StopBits==System.IO.Ports.StopBits.None) bpc=0;
 			else if(StopBits==System.IO.Ports.StopBits.One) bpc=1;
