@@ -99,7 +99,7 @@ namespace ModBus {
 		public new void Open() {
 			float charTime = timeChar_ms();
 			tmr_3_5char.Interval=charTime*3.5;	//3,5 caracteres, conforme o protocolo
-			tmr_TimeOut.Interval=charTime*1000;	//planejar esse tempo depois
+			tmr_TimeOut.Interval=charTime*100;	//planejar esse tempo depois
 			base.Open();
 			DiscardInBuffer();
 

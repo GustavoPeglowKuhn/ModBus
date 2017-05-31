@@ -78,7 +78,11 @@ namespace ModBus {
 			btn_m2_off.Click+=delegate { motorUserComand[1]=false; };
 			btn_m3_off.Click+=delegate { motorUserComand[2]=false; };
 
-			refreshTimer.Elapsed+=delegate { RefreshRegisters(); };
+			refreshTimer.Elapsed+=delegate {
+				refreshTimer.Enabled=false;
+				RefreshRegisters();
+				refreshTimer.Enabled=true;
+			};
 			refreshTimer.Interval=750; //planejar esse tempo depois
 			
 			modBusPort.MessageReceived+=InterpretaMensagem;
@@ -93,6 +97,7 @@ namespace ModBus {
 		}
 
 		private void InterpretaMensagem(object sender, MessageReceivedEventArgs e) {
+			if(ErrorCount>0) ErrorCount--;
 			Message query = e.MessagePair.Key, answer = e.MessagePair.Value;
 			List<byte> queryBody=query.GetBody(), answerBody=answer.GetBody();
 
@@ -215,7 +220,7 @@ namespace ModBus {
 		}
 
 		private void InterpretaMensagemSemResposta(object sender, MessageTimeOutEventArgs e) {  //so para teste por enquanto
-			if(++ErrorCount>3) {
+			if(++ErrorCount>3) {	//evita a criacao de muitas mensagens de erro na tela
 				ms_sp_disconect_Click(this, new EventArgs());
 				MessageBox.Show("ModBusPort fechadas apos "+ErrorCount+" erros", "Erro de transmição");
 			} else {
@@ -224,7 +229,28 @@ namespace ModBus {
 		}
 
 		public void RefreshRegisters() {
-			if(modBusPort.WaitingMessage) return;									// evita sobrecarga no buffer da porta ModBus
+			if(modBusPort.WaitingMessage) return;                                   // evita sobrecarga no buffer da porta ModBus
+
+			
+			//////////////////////////////////////troca os  motores
+			bool changeMotorState=false;
+			for(int i = 0; i<3; i++) {
+				if(motorUserComand[i]&&motorState[i]==(byte)e_motorState.desligado) {         //ligar motor
+					motorState[i]=(byte)e_motorState.estrela;
+					changeMotorState=true;
+				} else if(( !motorUserComand[i] )&&motorState[i]!=(byte)e_motorState.desligado) { //desligar motor
+					motorState[i]=(byte)e_motorState.desligado;
+					changeMotorState=true;
+				}
+			}
+			if(changeMotorState) {
+				List<bool> Coils = CoilsState();
+				modBusPort.EscreverMensagem(Message.WriteNCoils(1, (ushort)MemoryAddress.Coils, Coils));
+				Invoke(new EventHandler(AtualizaTelaMotores));
+			}
+
+			modBusPort.EscreverMensagem(Message.ReadNInputs(1, (ushort)MemoryAddress.Inputs, 16));              //le o teclado
+
 			if(refreshMotorTime) {
 				modBusPort.EscreverMensagem(Message.WriteSigleHoldingRegisters(1, (ushort)MemoryAddress.Tm4, (ushort)nud_m4.Value));
 				refreshMotorTime=false;
@@ -236,25 +262,8 @@ namespace ModBus {
 				refreshTemperature=false;
 			}
 			modBusPort.EscreverMensagem(Message.ReadNHoldingRegisters(1, (ushort)MemoryAddress.Temp, 2));       //le a temperatura do lm35
-			modBusPort.EscreverMensagem(Message.ReadNInputs(1, (ushort)MemoryAddress.Inputs, 16));              //le o teclado
+			//modBusPort.EscreverMensagem(Message.ReadNInputs(1, (ushort)MemoryAddress.Inputs, 16));              //le o teclado
 			modBusPort.EscreverMensagem(Message.ReadNCoils(1, (ushort)MemoryAddress.Coils+6, 2));               //le o estado do quarto motor
-
-			//////////////////////////////////////troca os  motores
-			bool changeMotorState=false;
-			for(int i = 0; i<3; i++) {
-				if(motorUserComand[i]&&motorState[i]==(byte)e_motorState.desligado) {         //ligar motor
-					motorState[i]=(byte)e_motorState.estrela;
-					changeMotorState=true;
-				} else if(!motorUserComand[i]&&motorState[i]!=(byte)e_motorState.desligado) { //desligar motor
-					motorState[i]=(byte)e_motorState.desligado;
-					changeMotorState=true;
-				}
-			}
-			if(changeMotorState) {
-				List<bool> Coils = CoilsState();
-				modBusPort.EscreverMensagem(Message.WriteNCoils(1, (ushort)MemoryAddress.Coils, Coils));
-				Invoke(new EventHandler(AtualizaTelaMotores));
-			}
 
 			if(motorState[0]==(byte)e_motorState.estrela || motorState[1]==(byte)e_motorState.estrela || motorState[2]==(byte)e_motorState.estrela)
 				modBusPort.EscreverMensagem(Message.ReadNHoldingRegisters(1, (ushort)MemoryAddress.Tms, 3));	// ja le os 3 juntos, nao  faz tanta diferenca caso so precise de 1, mas economiza muito caso  precise dos 3
@@ -337,6 +346,8 @@ namespace ModBus {
 
 		private void btn_test_Click(object sender, EventArgs e) {   //so para teste
 			try {
+				if(modBusPort.IsOpen) RefreshRegisters();
+
 				//modBusPort.EscreverMensagem(Message.ReadNHoldingRegisters(1, (ushort)MemoryAddress.Tms, 4));	//temperatura
 				//modBusPort.EscreverMensagem(Message.ReadNHoldingRegisters(1, 0x18, 2));	//temperatura
 				//modBusPort.EscreverMensagem(Message.ReadNCoils(1, 0x00, 8));				//8leds
@@ -364,7 +375,7 @@ namespace ModBus {
 				//	modBusPort.EscreverMensagem(Message.WriteNCoils(1, (ushort)MemoryAddress.Coils, Coils));
 				//	Invoke(new EventHandler(AtualizaTelaMotores));
 				//}
-				
+
 				//if(	motorUserComand[0]&&motorState[0]==(byte)e_motorState.desligado||
 				//	motorUserComand[1]&&motorState[1]==(byte)e_motorState.desligado||
 				//	motorUserComand[2]&&motorState[2]==(byte)e_motorState.desligado){
