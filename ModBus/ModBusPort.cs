@@ -54,6 +54,7 @@ namespace ModBus {
 			Parity=System.IO.Ports.Parity.None;
 			StopBits=System.IO.Ports.StopBits.One;
 
+			//sempre que recebe um dado pala porta serial
 			DataReceived+=delegate {
 				tmr_TimeOut.Enabled=false;
 				tmr_3_5char.Enabled=false;
@@ -71,11 +72,15 @@ namespace ModBus {
 								
 				tmr_3_5char.Enabled=true; //search a beter way to clear the timer count//
 			};
+
+			//dispara 3,5*TEMPO_DE_CHAR depois de receber o ultimo caracter pela porta serial
 			tmr_3_5char.Elapsed+=delegate {	//after 3.5 char
 				tmr_3_5char.Enabled=false;
 				//waitingMessage=false;		//muda dentro do metodo ReadMessage(), somente apos ler o conteudo do bufer e descartar o mesmo
 				ReadMesssage();
 			};
+
+			//dispara um tempo depois do envio da ultima mensagem, mas apenas em caso de nao haver resposta
 			tmr_TimeOut.Elapsed+=delegate {
 				tmr_TimeOut.Enabled=false;
 				//TimeOutQueue.Enqueue(writeBuffer.Dequeue());

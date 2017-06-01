@@ -69,12 +69,10 @@
 			this.tb_cur_tem = new System.Windows.Forms.TextBox();
 			this.label12 = new System.Windows.Forms.Label();
 			this.label16 = new System.Windows.Forms.Label();
-			this.btn_test = new System.Windows.Forms.Button();
 			this.tb_LDC_l1 = new System.Windows.Forms.TextBox();
 			this.tb_LDC_l2 = new System.Windows.Forms.TextBox();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
 			this.nud_setTemp = new System.Windows.Forms.NumericUpDown();
-			this.button1 = new System.Windows.Forms.Button();
 			this.menuStrip1.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.nud_dType)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.nud_m1)).BeginInit();
@@ -91,7 +89,7 @@
             this.ms_SerialPort});
 			this.menuStrip1.Location = new System.Drawing.Point(0, 0);
 			this.menuStrip1.Name = "menuStrip1";
-			this.menuStrip1.Size = new System.Drawing.Size(627, 24);
+			this.menuStrip1.Size = new System.Drawing.Size(499, 24);
 			this.menuStrip1.TabIndex = 3;
 			this.menuStrip1.Text = "menuStrip1";
 			// 
@@ -570,48 +568,36 @@
 			this.label16.TabIndex = 44;
 			this.label16.Text = "Temperatura atual:";
 			// 
-			// btn_test
-			// 
-			this.btn_test.Location = new System.Drawing.Point(33, 284);
-			this.btn_test.Name = "btn_test";
-			this.btn_test.Size = new System.Drawing.Size(195, 23);
-			this.btn_test.TabIndex = 47;
-			this.btn_test.Text = "teste";
-			this.btn_test.UseVisualStyleBackColor = true;
-			this.btn_test.Click += new System.EventHandler(this.btn_test_Click);
-			// 
 			// tb_LDC_l1
 			// 
 			this.tb_LDC_l1.BackColor = System.Drawing.Color.LimeGreen;
 			this.tb_LDC_l1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.tb_LDC_l1.Font = new System.Drawing.Font("Consolas", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.tb_LDC_l1.Location = new System.Drawing.Point(6, 9);
+			this.tb_LDC_l1.Font = new System.Drawing.Font("Consolas", 16F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.tb_LDC_l1.Location = new System.Drawing.Point(6, 14);
 			this.tb_LDC_l1.MaxLength = 16;
 			this.tb_LDC_l1.Name = "tb_LDC_l1";
-			this.tb_LDC_l1.Size = new System.Drawing.Size(117, 23);
+			this.tb_LDC_l1.Size = new System.Drawing.Size(198, 32);
 			this.tb_LDC_l1.TabIndex = 49;
-			this.tb_LDC_l1.Text = "Isso esta desligado";
 			// 
 			// tb_LDC_l2
 			// 
 			this.tb_LDC_l2.BackColor = System.Drawing.Color.LimeGreen;
 			this.tb_LDC_l2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.tb_LDC_l2.Font = new System.Drawing.Font("Consolas", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.tb_LDC_l2.Location = new System.Drawing.Point(6, 29);
+			this.tb_LDC_l2.Font = new System.Drawing.Font("Consolas", 16F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.tb_LDC_l2.Location = new System.Drawing.Point(6, 42);
 			this.tb_LDC_l2.MaxLength = 16;
 			this.tb_LDC_l2.Name = "tb_LDC_l2";
-			this.tb_LDC_l2.Size = new System.Drawing.Size(117, 23);
+			this.tb_LDC_l2.Size = new System.Drawing.Size(198, 32);
 			this.tb_LDC_l2.TabIndex = 50;
-			this.tb_LDC_l2.Text = "perguntar para ele";
 			// 
 			// groupBox1
 			// 
 			this.groupBox1.BackColor = System.Drawing.Color.Black;
 			this.groupBox1.Controls.Add(this.tb_LDC_l1);
 			this.groupBox1.Controls.Add(this.tb_LDC_l2);
-			this.groupBox1.Location = new System.Drawing.Point(345, 248);
+			this.groupBox1.Location = new System.Drawing.Point(12, 206);
 			this.groupBox1.Name = "groupBox1";
-			this.groupBox1.Size = new System.Drawing.Size(129, 59);
+			this.groupBox1.Size = new System.Drawing.Size(211, 82);
 			this.groupBox1.TabIndex = 51;
 			this.groupBox1.TabStop = false;
 			// 
@@ -643,25 +629,13 @@
             0,
             131072});
 			// 
-			// button1
-			// 
-			this.button1.Location = new System.Drawing.Point(33, 313);
-			this.button1.Name = "button1";
-			this.button1.Size = new System.Drawing.Size(195, 23);
-			this.button1.TabIndex = 53;
-			this.button1.Text = "teste2";
-			this.button1.UseVisualStyleBackColor = true;
-			this.button1.Click += new System.EventHandler(this.button1_Click);
-			// 
 			// Form1
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(627, 352);
-			this.Controls.Add(this.button1);
+			this.ClientSize = new System.Drawing.Size(499, 300);
 			this.Controls.Add(this.nud_setTemp);
 			this.Controls.Add(this.groupBox1);
-			this.Controls.Add(this.btn_test);
 			this.Controls.Add(this.tb_cur_tem);
 			this.Controls.Add(this.label12);
 			this.Controls.Add(this.label16);
@@ -763,12 +737,10 @@
 		private System.Windows.Forms.ToolStripComboBox ms_sp_par_combobox;
 		private System.Windows.Forms.ToolStripMenuItem ms_sp_stopBits;
 		private System.Windows.Forms.ToolStripComboBox ms_sp_stop_combobox;
-		private System.Windows.Forms.Button btn_test;
 		private System.Windows.Forms.TextBox tb_LDC_l1;
 		private System.Windows.Forms.TextBox tb_LDC_l2;
 		private System.Windows.Forms.GroupBox groupBox1;
 		private System.Windows.Forms.NumericUpDown nud_setTemp;
-		private System.Windows.Forms.Button button1;
 	}
 }
 

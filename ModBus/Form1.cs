@@ -96,10 +96,9 @@ namespace ModBus {
 			lbl_status_m2.Text=s_motorState[0];
 			lbl_status_m3.Text=s_motorState[0];
 			lbl_status_m4.Text=s_motorState[0];
-
-			IHMmessage=makeMessage("It isn't fun", "     any more");
 		}
 
+		//evento disparado pela porta modBusPort para cada mensagem recebida
 		private void InterpretaMensagem(object sender, MessageReceivedEventArgs e) {
 			if(ErrorCount>0) ErrorCount--;
 			Message query = e.MessagePair.Key, answer = e.MessagePair.Value;
@@ -198,6 +197,7 @@ namespace ModBus {
 			}
 		}
 
+		//retorna um vetor de 32 bytes contendo as strings l1 e l2, usada para criar a mensagem do LCD
 		byte[] makeMessage(string l1, string l2) {
 			byte[] mes = new byte[32];
 			for(int i = 0; i<l1.Length; i++) mes[i]=(byte)l1[i];
@@ -207,15 +207,18 @@ namespace ModBus {
 			return mes;
 		}
 
+		//atualiza o estado dos motores na tela do master
 		private void AtualizaTelaMotores(object sender, EventArgs e) {
 			lbl_status_m1.Text=s_motorState[motorState[0]];
 			lbl_status_m2.Text=s_motorState[motorState[1]];
 			lbl_status_m3.Text=s_motorState[motorState[2]];
 			lbl_status_m4.Text=s_motorState[motorState[3]];
 		}
+		//atualiza temperatura medida pelo kit na tela do master
 		private void AtualizaTelaTemperatura(object sender, EventArgs e) {
 			tb_cur_tem.Text=temperatura.ToString();
 		}
+		//atualiza o display LCD na tela do master
 		private void AtualizaLcd(object sender, EventArgs e) {
 			tb_LDC_l1.Clear();
 			for(byte b = 0; b<16; b++)  tb_LDC_l1.AppendText(""+(char)IHMmessage[b]);
@@ -223,6 +226,9 @@ namespace ModBus {
 			for(byte b = 16; b<32; b++) tb_LDC_l2.AppendText(""+(char)IHMmessage[b]);
 		}
 
+		//evento disparado pela porta modBusPort para cada mensagem TimeOut
+		//pode ser incerido o codigo para reenvio de mensagens importantes
+		//possui um contador de mensagens nao enviadas, o qu evita do master ficar infinitamente tentando enviar mensagens no caso do kit se desconectar inesperadamente
 		private void InterpretaMensagemSemResposta(object sender, MessageTimeOutEventArgs e) {  //so para teste por enquanto
 			if(++ErrorCount>3) {	//evita a criacao de muitas mensagens de erro na tela
 				ms_sp_disconect_Click(this, new EventArgs());
@@ -232,10 +238,12 @@ namespace ModBus {
 			}
 		}
 
+		//funcao chamada pelo timer refreshTimer a cada 150*modBusPort.timeChar_ms()
+		//envia perguntas para o kit
 		public void RefreshRegisters() {
 			if(modBusPort.WaitingMessage) return;                                   // evita sobrecarga no buffer da porta ModBus
 
-			if(nextMessage==0) {
+			if(nextMessage==0) {	//faz a verificacao se precisa enviar a mensagem 0
 				bool changeMotorState=false;
 				for(int i = 0; i<3; i++) {
 					if(motorUserComand[i]&&motorState[i]==(byte)e_motorState.desligado) {         //ligar motor
@@ -250,8 +258,8 @@ namespace ModBus {
 					nextMessage++;
 				}
 			} else {
-				if(nextMessage==2&&( !refreshMotorTime )) nextMessage++;
-				if(nextMessage==3&&( !refreshTemperature )) nextMessage++;
+				if(nextMessage==2&&( !refreshMotorTime )) nextMessage++;    //faz a verificacao se precisa enviar a mensagem 2
+				if(nextMessage==3&&( !refreshTemperature )) nextMessage++;  //faz a verificacao se precisa enviar a mensagem 3
 			}
 			
 			switch(nextMessage) {
@@ -289,13 +297,16 @@ namespace ModBus {
 			nextMessage++;
 		}
 
+		//evento de clique no botao de expencao dos item do ms_sp_port
+		//atualizxa a lista de portas seriais disponiveis para a conecxao
 		private void ms_sp_port_combobox_DropDown(object sender, EventArgs e) {
-			/*	Essa funcao e chamada toda ves que o usuario verifica as portas seriais disponiveis		*/
+			//	Essa funcao e chamada toda ves que o usuario verifica as portas seriais disponiveis
 			ms_sp_port_combobox.Items.Clear();
 			foreach(string port in System.IO.Ports.SerialPort.GetPortNames()) {
 				ms_sp_port_combobox.Items.Add(port);
 			}
 		}
+		//evento chamado quando o usuario troca a porta serial
 		private void ms_sp_port_combobox_SelectedIndexChanged(object sender, EventArgs e) {
 			/*	Essa funcao e chamada toda ves que o usuario troca de porta serial		*/
 			if(ms_sp_port_combobox.Items.Count==0) {
@@ -305,15 +316,16 @@ namespace ModBus {
 			//serialPort.PortName=ms_sp_port_combobox.SelectedItem.ToString();
 			//tb_receive.Text="Debug - "+serialPort.PortName;
 		}
+		//evento chamado quando o usuario troca o baud rate da porta serial
 		private void ms_sp_baud_combobox_SelectedIndexChanged(object sender, EventArgs e) {
 			/*	Essa funcao e chamada toda ves que o usuario troca o baudRate		*/
 			modBusPort.BaudRate=iBaudRate[ms_sp_baud_combobox.SelectedIndex];
 			//serialPort.BaudRate = iBaudRate[ms_sp_baud_combobox.SelectedIndex];
 			//tb_receive.Text="Debug - "+serialPort.BaudRate.ToString();
 		}
-		//uncomment refreshTimer.Enabled=true;
+		//comment refreshTimer.Enabled=true; to disable refreshTimer
 		private void ms_sp_conect_Click(object sender, EventArgs e) {
-			/*	Essa funcao e chamada toda ves que o usuario abre a porta serial		*/
+			//Essa funcao e chamada toda ves que o usuario abre a porta serial
 			try {
 				modBusPort.Open();
 				refreshTimer.Enabled=true;
@@ -343,6 +355,7 @@ namespace ModBus {
 			modBusPort.Parity=(System.IO.Ports.Parity)ms_sp_par_combobox.SelectedIndex;
 		}
 
+		//chamada antes do fechamento do formulario
 		private void Form1_FormClosing(object sender, FormClosingEventArgs e) {
 			/*	antes de fechar o programa, fecha a porta serial caso ela esteja aberta		*/
 			if(modBusPort.IsOpen) modBusPort.Close();
@@ -356,6 +369,8 @@ namespace ModBus {
 			}
 			serialPort.Write(tb_send.Text);
 		}*/
+
+		//cahmada quando o troca o dispositivo slave
 		private void nud_dType_ValueChanged(object sender, EventArgs e) {
 			if (nud_dType.Value == (int)e_devices.broadcast)
 				lbl_dType.Text = devices[(int)e_devices.broadcast];
@@ -365,7 +380,7 @@ namespace ModBus {
                 lbl_dType.Text = "unknow";
 		}
 
-		private void btn_test_Click(object sender, EventArgs e) {   //so para teste
+		/*private void btn_test_Click(object sender, EventArgs e) {   //so para teste
 			try {
 				//if(modBusPort.IsOpen) RefreshRegisters();
 
@@ -415,8 +430,9 @@ namespace ModBus {
 				/////////////////////////////////verifica o tempo dos motores
 				//modBusPort.EscreverMensagem(Message.ReadNHoldingRegisters(1, (ushort)MemoryAddress.Tm1, 3));
 			} catch(Exception) { }
-		}		
+		}		*/
 
+		//retorna um vetor de 6 bits com o valor que deve ser enviado para as bobinas do kit a fim de trocar o estado dos motores
 		List<bool> CoilsState() {
 			List<bool> res = new List<bool>();
 			res.Add(( motorState[0]&0x02 )!=0);
