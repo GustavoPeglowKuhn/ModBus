@@ -147,16 +147,20 @@ namespace ModBus {
 								temp[1]=answerBody[3];
 								temp[0]=answerBody[4];
 								temperatura=BitConverter.ToSingle(temp, 0);
+
+								motorUserComand[3]=temperatura>=(float)nud_setTemp.Value;
+
 								Invoke(new EventHandler(AtualizaTelaTemperatura));
 							} catch(Exception) { }
 						}else if(queryBody[1]==(byte)MemoryAddress.Tms) {
 							ushort t;
 							bool changeMotorState=false;
-							ushort[] tn = new ushort[3];
+							ushort[] tn = new ushort[4];
 							tn[0]=(ushort)nud_m1.Value;
 							tn[1]=(ushort)nud_m2.Value;
 							tn[2]=(ushort)nud_m3.Value;
-							for(int i=0; i<3; i++) {
+							tn[3]=(ushort)nud_m4.Value;
+							for(int i=0; i<4; i++) {
 								t=(ushort)( 256*answerBody[1+2*i]+answerBody[0+2*i] );
 								if(t>tn[i]&&motorState[i]==(byte)e_motorState.estrela) {           //troca para triangulo
 									motorState[i]=(byte)e_motorState.triangulo;
@@ -245,7 +249,8 @@ namespace ModBus {
 
 			if(nextMessage==0) {	//faz a verificacao se precisa enviar a mensagem 0
 				bool changeMotorState=false;
-				for(int i = 0; i<3; i++) {
+				//for(int i = 0; i<3; i++) {
+				for(int i = 0; i<4; i++) {
 					if(motorUserComand[i]&&motorState[i]==(byte)e_motorState.desligado) {         //ligar motor
 						motorState[i]=(byte)e_motorState.estrela;
 						changeMotorState=true;
@@ -258,7 +263,8 @@ namespace ModBus {
 					nextMessage++;
 				}
 			} else {
-				if(nextMessage==2&&( !refreshMotorTime )) nextMessage++;    //faz a verificacao se precisa enviar a mensagem 2
+				//if(nextMessage==2&&( !refreshMotorTime )) nextMessage++;    //faz a verificacao se precisa enviar a mensagem 2
+				if(nextMessage==2) nextMessage++;
 				if(nextMessage==3&&( !refreshTemperature )) nextMessage++;  //faz a verificacao se precisa enviar a mensagem 3
 			}
 			
@@ -275,7 +281,7 @@ namespace ModBus {
 					modBusPort.EscreverMensagem(Message.WriteSigleHoldingRegisters(1, (ushort)MemoryAddress.Tm4, (ushort)nud_m4.Value));
 					refreshMotorTime=false;
 					break;
-				case 3:
+				case 3:	//pode tirar pois o motor é controlado pelo PC agora
 					byte[] vec = BitConverter.GetBytes((float)nud_setTemp.Value);										//envia a temperatura
 					Array.Reverse(vec);
 					modBusPort.EscreverMensagem(Message.WriteNHoldingRegisters(1, (int)MemoryAddress.SetPoint, vec));
@@ -284,16 +290,15 @@ namespace ModBus {
 				case 4:
 					modBusPort.EscreverMensagem(Message.ReadNHoldingRegisters(1, (ushort)MemoryAddress.Temp, 2));       //le a temperatura do lm35
 					break;
+				//case 5:
+				//	modBusPort.EscreverMensagem(Message.ReadNCoils(1, (ushort)MemoryAddress.Coils+6, 2));               //le o estado do quarto motor
+				//	break;
 				case 5:
-					modBusPort.EscreverMensagem(Message.ReadNCoils(1, (ushort)MemoryAddress.Coils+6, 2));               //le o estado do quarto motor
-					break;
-				case 6:
-					if(motorState[0]==(byte)e_motorState.estrela||motorState[1]==(byte)e_motorState.estrela||motorState[2]==(byte)e_motorState.estrela)
-						modBusPort.EscreverMensagem(Message.ReadNHoldingRegisters(1, (ushort)MemoryAddress.Tms, 3));    // ja le os 3 juntos, nao  faz tanta diferenca caso so precise de 1, mas economiza muito caso  precise dos 3
+					if(motorState[0]==(byte)e_motorState.estrela||motorState[1]==(byte)e_motorState.estrela||motorState[2]==(byte)e_motorState.estrela||motorState[3]==(byte)e_motorState.estrela)
+						modBusPort.EscreverMensagem(Message.ReadNHoldingRegisters(1, (ushort)MemoryAddress.Tms, 4));    // ja le os 3 juntos, nao  faz tanta diferenca caso so precise de 1, mas economiza muito caso  precise dos 3
 					nextMessage=0;
 					return; //retorna para nao incrementar nextMessage
 			}
-
 			nextMessage++;
 		}
 
@@ -441,6 +446,8 @@ namespace ModBus {
 			res.Add(( motorState[1]&0x01 )!=0);
 			res.Add(( motorState[2]&0x02 )!=0);
 			res.Add(( motorState[2]&0x01 )!=0);
+			res.Add(( motorState[3]&0x02 )!=0);
+			res.Add(( motorState[3]&0x01 )!=0);
 			return res;
 		}
 	}

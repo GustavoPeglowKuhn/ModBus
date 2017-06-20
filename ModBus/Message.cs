@@ -198,7 +198,7 @@ namespace ModBus {
 				if(mask==0x80) {
 					mask=0x01;		//bits alinhads a direita
 					resByte++;
-					body[5+resByte]=0;
+					if(resByte<N) body[5+resByte]=0;	//zera o byte seguinte, e o if para não dar OutOfRange
 				}else mask<<=1;
 			}
 
